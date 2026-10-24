@@ -1,6 +1,7 @@
 # ADR-0022: Opt-in, PII-free crash reports and an exportable diagnostic bundle
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Support, Legal
 - **Related:** NFR-OPS-03, NFR-OPS-04 · FR-LIC-05 · TC-01 · ADR-0014, ADR-0017, ADR-0020

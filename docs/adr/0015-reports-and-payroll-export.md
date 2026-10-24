@@ -1,6 +1,7 @@
 # ADR-0015: On-device reports; Excel (.xlsx) and Tally Prime XML exports through the OS share sheet
 
-- **Status:** Accepted (Tally Prime only for Phase 1 — confirms D-5 unless sales evidence says otherwise before M2)
+- **Status:** In review
+- **Proposed outcome:** Accepted (Tally Prime only for Phase 1 — confirms D-5 unless sales evidence says otherwise before M2)
 - **Date:** 24-10-2026
 - **Deciders:** Product, Engineering
 - **Related:** FR-RPT-01..06 · TC-06 · NFR-PERF-05 · §3.3 "Tally accepts without manual edits ≥95%" · Designs 10, 15, 16 · ADR-0011, ADR-0012

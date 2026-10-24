@@ -1,6 +1,7 @@
 # ADR-0016: ARB-based localisation, recorded voice clips plus TTS for names, Indian formats
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Product, Design, Engineering
 - **Related:** FR-L10N-01..06 · FR-ENR-02 · FR-DPR-04 · NFR-UX-01 · Designs 01–05, 13 · ADR-0005

@@ -1,6 +1,7 @@
 # ADR-0002: Flutter for the app UI, with native camera and ML modules
 
-- **Status:** Proposed — confirm at the end of the M0 feasibility spike (decision D-2)
+- **Status:** In review
+- **Proposed outcome:** Proposed — confirm at the end of the M0 feasibility spike (decision D-2)
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, ML
 - **Related:** PRD §8.1 TC-02, TC-03 · FR-PLT-01..03 · D-2 · ADR-0003, ADR-0006

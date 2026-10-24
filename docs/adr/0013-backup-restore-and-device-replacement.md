@@ -1,6 +1,7 @@
 # ADR-0013: Passphrase-encrypted backups (no biometrics) to a local file or the owner's Google Drive
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Security, Product
 - **Related:** FR-OFF-02..05, FR-LIC-06 · NFR-SEC-04 · TC-01 · §9.3 · Risk R-4 · Design 17 · ADR-0010, ADR-0014

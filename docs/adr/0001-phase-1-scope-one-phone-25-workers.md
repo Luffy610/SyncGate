@@ -1,6 +1,7 @@
 # ADR-0001: Phase 1 scope — one phone, one gate, up to 25 workers, fully offline
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Product, Engineering, Design, Sales
 - **Related:** PRD §1, §3, §5.1, §6.1, §7.1, §7.3, §12 · supersedes the device and headcount assumptions in PRD v0.2

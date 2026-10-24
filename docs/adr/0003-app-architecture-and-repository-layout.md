@@ -1,6 +1,7 @@
 # ADR-0003: Layered, modular app architecture and monorepo layout
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering
 - **Related:** PRD §8.2 · TC-01, TC-05 · ADR-0002, ADR-0004, ADR-0010, ADR-0011

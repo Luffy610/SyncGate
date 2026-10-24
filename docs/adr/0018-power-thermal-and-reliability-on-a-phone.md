@@ -1,6 +1,7 @@
 # ADR-0018: Duty-cycled camera, wake/thermal management, crash recovery and a paper fallback
 
-- **Status:** Accepted (numbers validated in the M0 soak test)
+- **Status:** In review
+- **Proposed outcome:** Accepted (numbers validated in the M0 soak test)
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product
 - **Related:** NFR-HW-04, NFR-PERF-04, NFR-REL-01..04 · Risk R-4 · ADR-0001, ADR-0004, ADR-0006

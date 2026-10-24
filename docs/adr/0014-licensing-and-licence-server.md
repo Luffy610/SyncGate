@@ -1,6 +1,7 @@
 # ADR-0014: Ed25519-signed offline licence tokens; a minimal metadata-only licence server in India
 
-- **Status:** Accepted (licensing model, token design) · Proposed (server stack — confirm before M2)
+- **Status:** In review
+- **Proposed outcome:** Accepted (licensing model, token design) · Proposed (server stack — confirm before M2)
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product, Finance, Legal
 - **Related:** FR-LIC-01..07 · FR-PLT-05 · TC-04 · NFR-SEC-03 · Risk R-10 · D-3 · ADR-0013, ADR-0017

@@ -1,6 +1,7 @@
 # ADR-0019: Supported phones and OS versions; reference device certification
 
-- **Status:** Proposed — the certified device list is fixed at the end of M0
+- **Status:** In review
+- **Proposed outcome:** Proposed — the certified device list is fixed at the end of M0
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product, Sales
 - **Related:** FR-PLT-01, FR-PLT-03, FR-PLT-04 · NFR-HW-01..03 · TC-02 · ADR-0001, ADR-0006, ADR-0018

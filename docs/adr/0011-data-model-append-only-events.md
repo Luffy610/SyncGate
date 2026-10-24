@@ -1,6 +1,7 @@
 # ADR-0011: Append-only attendance events, corrections as new records, hash-chained audit log, UUIDv7 IDs
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product
 - **Related:** FR-ATT-07, FR-SHF-06, FR-SHF-07, FR-ADM-03, FR-DPR-01..03 · TC-05 · CMP-05 · ADR-0010, ADR-0012

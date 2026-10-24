@@ -1,6 +1,7 @@
 # ADR-0005: One brand design system with platform-adaptive chrome; bundled fonts
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Design, Engineering
 - **Related:** PRD §4.2 (pillar 3), FR-L10N-01..03, NFR-UX-01..04 · Designs in [`docs/designs`](../designs) · ADR-0002, ADR-0016

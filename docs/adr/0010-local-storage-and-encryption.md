@@ -1,6 +1,7 @@
 # ADR-0010: Encrypted SQLite (SQLCipher via Drift) and a separate native template vault
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Security
 - **Related:** NFR-SEC-01, NFR-SEC-02, NFR-SEC-04 · NFR-REL-02 · FR-OFF-03 · CMP-06 · TC-01 · ADR-0003, ADR-0011, ADR-0013

@@ -22,8 +22,11 @@ SyncGate Phase 1 turns **one ordinary Android or iOS phone** into a complete att
 
 ## 2. Status legend
 
+> **Current state:** every Phase 1 ADR is **In review**. The "Proposed outcome" column shows the status each record will take once its named deciders approve it.
+
 | Status | Meaning |
 |---|---|
+| **In review** | Written and open for review by the deciders named in the ADR. Prototypes may start against it, but nothing is final. The record's "Proposed outcome" says what it will become if approved. |
 | **Accepted** | Decided. Build against it. Change only through a new ADR that supersedes it. |
 | **Proposed** | Our recommended direction. Build prototypes against it. It is confirmed or changed at the gate named in the ADR (usually the M0 feasibility spike). |
 | **Open** | A decision we know we need but cannot take yet (usually legal or commercial). |
@@ -33,30 +36,30 @@ SyncGate Phase 1 turns **one ordinary Android or iOS phone** into a complete att
 
 ## 3. Decision log
 
-| # | Decision | Status | Area |
-|---|---|---|---|
-| [0001](0001-phase-1-scope-one-phone-25-workers.md) | Phase 1 scope: one phone, one gate, up to 25 workers, fully offline | Accepted | Product |
-| [0002](0002-cross-platform-framework-flutter.md) | Flutter for the app UI, with native camera and ML modules | Proposed (confirm at M0) | Platform |
-| [0003](0003-app-architecture-and-repository-layout.md) | Layered, modular app architecture and monorepo layout | Accepted | Architecture |
-| [0004](0004-single-device-gate-and-admin-modes.md) | One device, two modes (Gate kiosk and Admin), with roles and OS kiosk locking | Accepted | Product / Architecture |
-| [0005](0005-design-system-and-platform-adaptive-ui.md) | One brand design system with platform-adaptive chrome; bundled fonts | Accepted | Design |
-| [0006](0006-on-device-vision-pipeline.md) | On-device vision pipeline on LiteRT: detection, quality, alignment, embedding | Proposed (confirm at M0) | ML |
-| [0007](0007-liveness-detection.md) | Passive liveness by default, with an optional active fallback | Proposed (confirm at M0) | ML / Security |
-| [0008](0008-enrolment-and-template-management.md) | Guided multi-angle enrolment; several templates per worker; no raw images kept | Accepted | ML / Privacy |
-| [0009](0009-face-matching-and-thresholds.md) | Exact 1:N cosine matching with margin and multi-frame agreement | Accepted | ML |
-| [0010](0010-local-storage-and-encryption.md) | Encrypted SQLite (SQLCipher via Drift) and a separate template vault, keys in Keystore/Keychain | Accepted | Data / Security |
-| [0011](0011-data-model-append-only-events.md) | Append-only attendance events, corrections as new records, hash-chained audit log, UUIDv7 IDs | Accepted | Data |
-| [0012](0012-time-shifts-and-attendance-rules-engine.md) | Pure-Dart shift and rules engine; time model and clock-integrity checks | Accepted | Domain |
-| [0013](0013-backup-restore-and-device-replacement.md) | Passphrase-encrypted backups (no biometrics) to a local file or the owner's Google Drive | Accepted | Data |
-| [0014](0014-licensing-and-licence-server.md) | Ed25519-signed offline licence tokens; a minimal metadata-only licence server in India | Proposed (stack) / Accepted (model) | Commercial / Backend |
-| [0015](0015-reports-and-payroll-export.md) | On-device reports; Excel (.xlsx) and Tally Prime XML exports through the OS share sheet | Accepted | Product |
-| [0016](0016-localization-voice-and-indian-formats.md) | ARB-based localisation, recorded voice clips plus TTS for names, Indian formats | Accepted | Product / Design |
-| [0017](0017-security-hardening-and-privacy-dpdp.md) | Security hardening and DPDP-by-design controls | Accepted | Security / Compliance |
-| [0018](0018-power-thermal-and-reliability-on-a-phone.md) | Duty-cycled camera, wake/thermal management, crash recovery, paper fallback | Accepted | Reliability |
-| [0019](0019-supported-devices-and-os-versions.md) | Supported phones and OS versions; reference device certification | Proposed (device list at M0) | Platform |
-| [0020](0020-testing-strategy-and-ml-evaluation.md) | Test pyramid, device lab and a biometric evaluation harness | Accepted | Quality |
-| [0021](0021-build-ci-cd-release-and-store-compliance.md) | GitHub Actions + Fastlane, flavours, signing, store compliance | Accepted | Delivery |
-| [0022](0022-telemetry-diagnostics-and-support.md) | Opt-in, PII-free crash reports and an exportable diagnostic bundle | Accepted | Operations |
+| # | Decision | Status | Proposed outcome | Area |
+|---|---|---|---|---|
+| [0001](0001-phase-1-scope-one-phone-25-workers.md) | Phase 1 scope: one phone, one gate, up to 25 workers, fully offline | In review | Accepted | Product |
+| [0002](0002-cross-platform-framework-flutter.md) | Flutter for the app UI, with native camera and ML modules | In review | Proposed (confirm at M0) | Platform |
+| [0003](0003-app-architecture-and-repository-layout.md) | Layered, modular app architecture and monorepo layout | In review | Accepted | Architecture |
+| [0004](0004-single-device-gate-and-admin-modes.md) | One device, two modes (Gate kiosk and Admin), with roles and OS kiosk locking | In review | Accepted | Product / Architecture |
+| [0005](0005-design-system-and-platform-adaptive-ui.md) | One brand design system with platform-adaptive chrome; bundled fonts | In review | Accepted | Design |
+| [0006](0006-on-device-vision-pipeline.md) | On-device vision pipeline on LiteRT: detection, quality, alignment, embedding | In review | Proposed (confirm at M0) | ML |
+| [0007](0007-liveness-detection.md) | Passive liveness by default, with an optional active fallback | In review | Proposed (confirm at M0) | ML / Security |
+| [0008](0008-enrolment-and-template-management.md) | Guided multi-angle enrolment; several templates per worker; no raw images kept | In review | Accepted | ML / Privacy |
+| [0009](0009-face-matching-and-thresholds.md) | Exact 1:N cosine matching with margin and multi-frame agreement | In review | Accepted | ML |
+| [0010](0010-local-storage-and-encryption.md) | Encrypted SQLite (SQLCipher via Drift) and a separate template vault, keys in Keystore/Keychain | In review | Accepted | Data / Security |
+| [0011](0011-data-model-append-only-events.md) | Append-only attendance events, corrections as new records, hash-chained audit log, UUIDv7 IDs | In review | Accepted | Data |
+| [0012](0012-time-shifts-and-attendance-rules-engine.md) | Pure-Dart shift and rules engine; time model and clock-integrity checks | In review | Accepted | Domain |
+| [0013](0013-backup-restore-and-device-replacement.md) | Passphrase-encrypted backups (no biometrics) to a local file or the owner's Google Drive | In review | Accepted | Data |
+| [0014](0014-licensing-and-licence-server.md) | Ed25519-signed offline licence tokens; a minimal metadata-only licence server in India | In review | Proposed (stack) / Accepted (model) | Commercial / Backend |
+| [0015](0015-reports-and-payroll-export.md) | On-device reports; Excel (.xlsx) and Tally Prime XML exports through the OS share sheet | In review | Accepted | Product |
+| [0016](0016-localization-voice-and-indian-formats.md) | ARB-based localisation, recorded voice clips plus TTS for names, Indian formats | In review | Accepted | Product / Design |
+| [0017](0017-security-hardening-and-privacy-dpdp.md) | Security hardening and DPDP-by-design controls | In review | Accepted | Security / Compliance |
+| [0018](0018-power-thermal-and-reliability-on-a-phone.md) | Duty-cycled camera, wake/thermal management, crash recovery, paper fallback | In review | Accepted | Reliability |
+| [0019](0019-supported-devices-and-os-versions.md) | Supported phones and OS versions; reference device certification | In review | Proposed (device list at M0) | Platform |
+| [0020](0020-testing-strategy-and-ml-evaluation.md) | Test pyramid, device lab and a biometric evaluation harness | In review | Accepted | Quality |
+| [0021](0021-build-ci-cd-release-and-store-compliance.md) | GitHub Actions + Fastlane, flavours, signing, store compliance | In review | Accepted | Delivery |
+| [0022](0022-telemetry-diagnostics-and-support.md) | Opt-in, PII-free crash reports and an exportable diagnostic bundle | In review | Accepted | Operations |
 
 ---
 
@@ -145,14 +148,15 @@ SyncGate Phase 1 turns **one ordinary Android or iOS phone** into a complete att
 ## 8. How to add or change an ADR
 
 1. Copy the template below into a new file `NNNN-short-title.md` with the next number.
-2. Open it as **Proposed** in a pull request. Tag the reviewers named in the ADR.
-3. When merged as **Accepted**, add it to the table above.
+2. Open it as **In review** in a pull request, with its **Proposed outcome**. Tag the reviewers named in the ADR.
+3. When the deciders approve, set **Status** to the agreed outcome (Accepted, Proposed or Open), remove the "Proposed outcome" line, and update the table above.
 4. To change an accepted decision, write a **new** ADR that supersedes it. Mark the old one **Superseded by ADR-NNNN**. Do not rewrite history.
 
 ```markdown
 # ADR-NNNN: Title
 
-- **Status:** Proposed | Accepted | Open | Superseded by ADR-XXXX
+- **Status:** In review | Proposed | Accepted | Open | Superseded by ADR-XXXX
+- **Proposed outcome:** (while In review) Accepted | Proposed | Open
 - **Date:** DD-MM-YYYY
 - **Deciders:** …
 - **Related:** PRD §…, FR-…, ADR-…

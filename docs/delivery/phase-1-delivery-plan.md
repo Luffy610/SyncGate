@@ -5,7 +5,7 @@
 | Scope | Phase 1 (v1 / GA): one phone, one gate, up to 25 workers, fully offline — [ADR-0001](../adr/0001-phase-1-scope-one-phone-25-workers.md) |
 | Inputs | [PRD](../PRD.md) · [ADR index](../adr/README.md) · [Designs (iOS)](../designs/ios) · [Designs (Android)](../designs/android) |
 | Plan owner | Product Manager + Tech Lead |
-| Status | Draft v1 — for review |
+| Status | **Planning — in review.** Draft v1; not yet baselined. Dates, estimates, team sizes and the capacity check are proposals until the PM and Tech Lead sign off at the M0 kick-off. |
 | Last updated | 24-10-2026 |
 | Hard dates | GA release **Thu 29-04-2027** · DPDP enforcement **14-05-2027** |
 

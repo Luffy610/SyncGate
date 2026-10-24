@@ -1,6 +1,7 @@
 # ADR-0008: Guided multi-angle enrolment; several templates per worker; no raw images kept
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** ML, Product, Design, Legal
 - **Related:** FR-ENR-01..07 · FR-DPR-01..04 · CMP-01, CMP-02, CMP-04, CMP-05, CMP-10 · NFR-SEC-02 · NFR-UX-03 · Designs 12–14

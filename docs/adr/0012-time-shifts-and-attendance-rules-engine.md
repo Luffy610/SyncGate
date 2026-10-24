@@ -1,6 +1,7 @@
 # ADR-0012: Pure-Dart shift and rules engine; time model and clock-integrity checks
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product
 - **Related:** FR-ATT-04, FR-ATT-05, FR-SHF-01..07, FR-OFF-06, FR-L10N-05 · ADR-0011, ADR-0015

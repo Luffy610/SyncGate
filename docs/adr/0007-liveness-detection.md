@@ -1,6 +1,7 @@
 # ADR-0007: Passive liveness by default, with an optional active fallback
 
-- **Status:** Proposed — thresholds and fallback behaviour confirmed at M0 and in beta
+- **Status:** In review
+- **Proposed outcome:** Proposed — thresholds and fallback behaviour confirmed at M0 and in beta
 - **Date:** 24-10-2026
 - **Deciders:** ML, Security, Product
 - **Related:** FR-ATT-02 · NFR-ACC-08 · Risk R-3 · ADR-0006, ADR-0009

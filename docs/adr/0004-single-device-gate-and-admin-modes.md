@@ -1,6 +1,7 @@
 # ADR-0004: One device, two modes — Gate kiosk and Admin — with roles and OS kiosk locking
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Product, Design, Engineering
 - **Related:** ADR-0001 · FR-PLT-02, FR-ADM-01..04, FR-ATT-01..06 · NFR-REL-03 · Designs 01–04, 08, 09

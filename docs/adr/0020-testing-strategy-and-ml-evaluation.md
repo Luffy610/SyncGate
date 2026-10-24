@@ -1,6 +1,7 @@
 # ADR-0020: Test pyramid, device lab and a biometric evaluation harness
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, ML, QA
 - **Related:** §3.3 metrics · NFR-PERF-*, NFR-ACC-01..08 · GA launch criteria (§13) · ADR-0002, ADR-0006, ADR-0007, ADR-0009, ADR-0012, ADR-0015

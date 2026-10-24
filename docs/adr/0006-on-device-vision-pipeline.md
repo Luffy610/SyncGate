@@ -1,6 +1,7 @@
 # ADR-0006: On-device vision pipeline on LiteRT
 
-- **Status:** Proposed — model choices confirmed at M0; the licence of every model and dataset must be cleared (TBD-L2) before GA
+- **Status:** In review
+- **Proposed outcome:** Proposed — model choices confirmed at M0; the licence of every model and dataset must be cleared (TBD-L2) before GA
 - **Date:** 24-10-2026
 - **Deciders:** ML, Engineering, Legal
 - **Related:** PRD §8.3 · TC-01, TC-02, TC-03 · FR-ATT-01..03, FR-ENR-04 · NFR-PERF-02, NFR-ACC-01..07 · ADR-0002, ADR-0007, ADR-0008, ADR-0009, ADR-0018

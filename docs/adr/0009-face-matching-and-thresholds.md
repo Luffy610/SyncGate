@@ -1,6 +1,7 @@
 # ADR-0009: Exact 1:N cosine matching with margin and multi-frame agreement
 
-- **Status:** Accepted (threshold values calibrated per model version)
+- **Status:** In review
+- **Proposed outcome:** Accepted (threshold values calibrated per model version)
 - **Date:** 24-10-2026
 - **Deciders:** ML, Engineering
 - **Related:** FR-ATT-01, FR-ATT-03, FR-ATT-06 · NFR-ACC-01, NFR-ACC-04, NFR-ACC-07 · §3.3 metrics · ADR-0006, ADR-0008

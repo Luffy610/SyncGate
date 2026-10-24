@@ -1,6 +1,7 @@
 # ADR-0017: Security hardening and DPDP-by-design controls
 
-- **Status:** Accepted (legal interpretations pending: TBD-L1, TBD-L3)
+- **Status:** In review
+- **Proposed outcome:** Accepted (legal interpretations pending: TBD-L1, TBD-L3)
 - **Date:** 24-10-2026
 - **Deciders:** Security, Engineering, Legal, Product
 - **Related:** PRD §9 (CMP-01..10), NFR-SEC-01..06, NFR-OPS-03, TC-01, TC-07 · Risks R-3, R-7, R-10 · ADR-0010, ADR-0011, ADR-0013, ADR-0014

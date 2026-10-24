@@ -1,6 +1,7 @@
 # ADR-0021: GitHub Actions + Fastlane, flavours, signing and store compliance
 
-- **Status:** Accepted
+- **Status:** In review
+- **Proposed outcome:** Accepted
 - **Date:** 24-10-2026
 - **Deciders:** Engineering, Product, Legal
 - **Related:** NFR-OPS-01 · TC-07 · §13 Release plan · ADR-0003, ADR-0014, ADR-0017, ADR-0020
