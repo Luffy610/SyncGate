@@ -38,8 +38,8 @@ Dart unit tests, widget tests and golden tests run on every OS, for both the iOS
 | Flutter SDK (includes Dart) | Stable channel, version pinned in `.fvmrc` | Everything |
 | FVM (Flutter Version Management) | 3.x | Using the exact pinned Flutter version (recommended) |
 | Melos | 8.x | Running commands across the monorepo |
-| JDK | 17 (bundled with Android Studio) | Android builds |
-| Android Studio + Android SDK | SDK Platform 35, Build-Tools 35, Platform-Tools, Emulator | Android builds and emulator |
+| JDK | The one bundled with Android Studio (`<Android Studio>/jbr`) — Flutter uses it automatically | Android builds |
+| Android Studio + Android SDK | SDK Platform **36** (Flutter compiles against it) and **35** (our `targetSdk`), Build-Tools 36, Platform-Tools, Emulator | Android builds and emulator |
 | Xcode | 16+ (macOS only) | iOS builds and simulator |
 | CocoaPods | 1.15+ (macOS only) | iOS native dependencies |
 | VS Code or Android Studio | latest, with the Flutter + Dart plugins | Editing and debugging |
@@ -101,9 +101,9 @@ start ms-settings:developers
 
 1. Install **Android Studio** from <https://developer.android.com/studio> (on Windows you can also run `winget install Google.AndroidStudio`).
 2. Open Android Studio → **More Actions → SDK Manager**:
-   - *SDK Platforms:* **Android 15 (API 35)**.
-   - *SDK Tools:* **Android SDK Build-Tools 35**, **Android SDK Command-line Tools (latest)**, **Android SDK Platform-Tools**, **Android Emulator**.
-3. Accept the Android SDK licences:
+   - *SDK Platforms:* **Android 16 (API 36)** and **Android 15 (API 35)**.
+   - *SDK Tools:* **Android SDK Build-Tools 36**, **NDK (Side by side) 28.2.13676358** (tick *Show Package Details*), **Android SDK Command-line Tools (latest)**, **Android SDK Platform-Tools**, **Android Emulator**.
+3. Accept the Android SDK licences (Android Studio asks during install; this confirms them):
 
    ```bash
    flutter doctor --android-licenses
@@ -118,6 +118,18 @@ If `flutter doctor` can't find the SDK or JDK:
 flutter config --android-sdk "<path to Android SDK>"
 flutter config --jdk-dir "<Android Studio>/jbr"
 ```
+
+**Command-line alternative (no Android Studio UI).** Google replaced `sdkmanager` with the `android` CLI in Command-line Tools 23; package names now use `/`. Download *Command line tools only* from <https://developer.android.com/studio#command-tools>, unzip it so the `bin` folder sits at `<SDK>/cmdline-tools/latest/bin`, then (Windows paths shown; set `JAVA_HOME` to any JDK 17+, e.g. Android Studio's `jbr`):
+
+```powershell
+$sdk = "$env:LOCALAPPDATA\Android\Sdk"
+& "$sdk\cmdline-tools\latest\bin\android.exe" --sdk="$sdk" sdk install platform-tools emulator platforms/android-36 platforms/android-35 build-tools/36.1.0 ndk/28.2.13676358 system-images/android-35/google_apis/x86_64
+& "$sdk\cmdline-tools\latest\bin\avdmanager.bat" create avd -n SyncGate_API_35 -k "system-images;android-35;google_apis;x86_64" -d pixel_7
+flutter config --android-sdk $sdk
+flutter emulators --launch SyncGate_API_35
+```
+
+On Windows the emulator needs **Windows Hypervisor Platform** (check with `emulator -accel-check`).
 
 ### 4. Set up iOS (macOS only)
 
@@ -189,6 +201,10 @@ For a single package: `cd packages/sg_ui && flutter test`.
 | `Building with plugins requires symlink support` (Windows) | Turn on Developer Mode (step 2) |
 | `Android license status unknown` | `flutter doctor --android-licenses` |
 | `Unable to locate Android SDK` | `flutter config --android-sdk <path>` |
+| `JAVA_HOME is not set` during a Gradle build | `flutter config --jdk-dir "<Android Studio>/jbr"` (Windows: `C:\Program Files\Android\Android Studio\jbr`) |
+| `sdkmanager did not install NDK <version>` | Install that exact NDK: Android Studio SDK Manager → SDK Tools → *NDK (Side by side)*, or `android sdk install ndk/<version>` |
+| `Flutter requires Android SDK 36` | Install SDK Platform 36 and Build-Tools 36 (step 3) |
+| `sdkmanager is deprecated` / packages not installed | Use the `android sdk install` command with `/` package names (step 3, command-line alternative) |
 | `CocoaPods not installed` or pod errors | `brew install cocoapods`, then `cd apps/mobile/ios && pod install --repo-update` |
 | Emulator shows a black camera | AVD settings → Front camera → Webcam0, or use the dev flavour's fake camera |
 | Hindi or Tamil text shows boxes | Fonts are bundled in `packages/sg_ui/assets/fonts`; run `melos bootstrap` again |

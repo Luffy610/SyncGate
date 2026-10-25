@@ -76,7 +76,7 @@ SyncGate/
 | Lints | `very_good_analysis` + `import_lint` rules: `sg_domain` may not import Flutter; `features/*` may not import `dev/`; screens may not import `package:flutter/cupertino.dart` or raw Material widgets (enforced by a custom lint over `features/`) |
 | Code gen | `riverpod_generator`, `freezed`, `json_serializable`, `go_router_builder` (typed routes), `flutter gen-l10n` |
 | Platforms | `flutter create --platforms=android,ios --org in.syncgate --project-name syncgate apps/mobile` |
-| Min OS | Android `minSdk 28`, `targetSdk 35`; iOS deployment target 15.0 ([ADR-0019](../adr/0019-supported-devices-and-os-versions.md)) |
+| Min OS | Android `minSdk 28`, `targetSdk 35`, `compileSdk 36` (required by Flutter 3.47); iOS deployment target 15.0 ([ADR-0019](../adr/0019-supported-devices-and-os-versions.md)) |
 | Orientation | Portrait only in Phase 1 (ADR-0001). Tablets get the same layout with `maxWidth: 600` centred. |
 
 ### 2.3 Flavours
