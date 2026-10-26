@@ -1,0 +1,19 @@
+# Shared lints for every package in the workspace. Packages don't keep their
+# own analysis_options.yaml, so this file applies to all of them.
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/generated/**"
+    - "**/build/**"
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    # Internal app code, not a published API.
+    public_member_api_docs: false

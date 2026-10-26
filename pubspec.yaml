@@ -1,0 +1,64 @@
+name: syncgate_workspace
+description: SyncGate monorepo root (Dart pub workspace + Melos scripts).
+publish_to: none
+
+environment:
+  sdk: ^3.13.0
+
+workspace:
+  - apps/mobile
+  - packages/sg_domain
+  - packages/sg_l10n
+  - packages/sg_platform
+  - packages/sg_ui
+  - packages/sg_vision
+
+dev_dependencies:
+  melos: ^8.9.0
+  very_good_analysis: ^11.0.0
+
+melos:
+  repository: https://github.com/Luffy610/SyncGate
+
+  scripts:
+    gen:
+      description: Run code generation (localisations; build_runner once packages use it).
+      run: melos exec --scope=sg_l10n -- flutter gen-l10n
+
+    analyze:
+      description: Import-boundary check, then the analyzer over the whole workspace.
+      run: dart run tools/check_imports.dart && dart analyze --fatal-infos
+
+    format:check:
+      description: Fail if any Dart file is not formatted.
+      run: dart format --output=none --set-exit-if-changed apps packages tools
+
+    test:
+      description: Run unit and widget tests in every package.
+      run: melos run test:dart --no-select && melos run test:flutter --no-select
+
+    test:dart:
+      description: Tests for pure Dart packages.
+      exec: dart test
+      packageFilters:
+        flutter: false
+        dirExists: test
+
+    test:flutter:
+      description: Tests for Flutter packages and the app.
+      exec: flutter test
+      packageFilters:
+        flutter: true
+        dirExists: test
+
+    test:golden:
+      description: Golden (screenshot) tests, iOS and Android looks.
+      exec: flutter test test/goldens
+      packageFilters:
+        dirExists: test/goldens
+
+    golden:update:
+      description: Regenerate golden files after an approved design change.
+      exec: flutter test test/goldens --update-goldens
+      packageFilters:
+        dirExists: test/goldens
