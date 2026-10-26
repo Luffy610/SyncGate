@@ -6,16 +6,18 @@ var _loaded = false;
 
 /// Widget tests draw text with the Ahem font (every glyph one em wide), which
 /// makes layouts look about twice as wide as on a phone. Loading the real
-/// Roboto from the Flutter SDK makes overflow checks meaningful.
+/// Roboto (bundled in `test/support/roboto`, so every machine and CI runner
+/// measures text the same) makes overflow checks meaningful.
 ///
 /// Devanagari has no font here, so Hindi text still uses the test fallback.
 Future<void> loadTestFonts() async {
   if (_loaded) return;
   _loaded = true;
-  final root = Platform.environment['FLUTTER_ROOT'];
-  if (root == null) return;
-  final dir = Directory('$root/bin/cache/artifacts/material_fonts');
-  if (!dir.existsSync()) return;
+  // `flutter test` runs with the package folder as the working directory.
+  final dir = Directory('test/support/roboto');
+  if (!dir.existsSync()) {
+    throw StateError('Test fonts missing: ${dir.absolute.path}');
+  }
 
   // iOS typography asks for the system fonts, which tests don't have, so
   // Roboto stands in for those too.
@@ -35,11 +37,12 @@ Future<void> loadTestFonts() async {
       'roboto-black',
     ]) {
       final file = File('${dir.path}/$name.ttf');
-      if (file.existsSync()) {
-        loader.addFont(
-          Future.value(ByteData.sublistView(file.readAsBytesSync())),
-        );
+      if (!file.existsSync()) {
+        throw StateError('Test font missing: ${file.absolute.path}');
       }
+      loader.addFont(
+        Future.value(ByteData.sublistView(file.readAsBytesSync())),
+      );
     }
     await loader.load();
   }
