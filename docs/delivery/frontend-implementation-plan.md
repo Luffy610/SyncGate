@@ -109,7 +109,50 @@ SyncGate/
 | `uuid` | UUIDv7 IDs in fakes (the real IDs come from the data layer) |
 | Dev: `alchemist`, `mocktail`, `patrol` | Goldens, mocks, device integration tests (ADR-0020) |
 
-Open decision **FE-1:** ADR-0003 names Riverpod 2. Riverpod 3 is the current stable line and works the same way with code generation. Proposal: start on Riverpod 3 and amend ADR-0003 in the F0 PR.
+Decision **FE-1 (settled in F0):** Riverpod 3 (3.4.x at scaffold time) instead of the Riverpod 2 named in ADR-0003; ADR-0003 is amended.
+
+### 2.5 F0 status (25-10-2026)
+
+Done on `feature/mobile-app-frontend`:
+- Workspace root (`pubspec.yaml` with Melos 8 scripts), `.fvmrc` (Flutter 3.47.8), shared `analysis_options.yaml` (very_good_analysis 11), root `.gitignore`.
+- `apps/mobile` (Android + iOS) with `main_dev|staging|prod.dart`, `bootstrap.dart`, `AppConfig` checked against `env/<flavour>.json`, a localised placeholder screen, and widget tests.
+- Android product flavours `dev | staging | prod` (IDs `in.syncgate.app[.dev|.staging]`), `minSdk 28`, `targetSdk 35`. iOS bundle ID `in.syncgate.app`, deployment target 15.0.
+- Packages: `sg_domain` (`Result` + tests), `sg_ui` (brand colours), `sg_l10n` (en + hi ARB, gen-l10n), `sg_vision` (`GateVisionService` + `VisionEvent` contract), `sg_platform` (`KioskService` contract).
+- `tools/check_imports.dart` (rules in §2.2) inside `melos run analyze`; `.github/workflows/pr.yml` (format, gen, analyze, test).
+
+Notes:
+- Dart 3.13 + very_good_analysis 11 use the new constructor syntax (`const new(...)`, `factory ok(...)`); `dart fix --apply` converts old-style constructors.
+- Not done in F0: iOS flavour schemes (FE-2, needs a Mac). Until then, run iOS without `--flavor`.
+
+### 2.6 F1–F5 status (25-10-2026)
+
+Built on `feature/mobile-app-frontend`, **on demo data** (in-memory fakes and a scripted camera; nothing talks to a real back end yet). `melos run analyze` is clean and all tests pass: `sg_domain` 33, `sg_ui` 20, `sg_l10n` 9, app 232 (screens, role gating, idle timer, both looks at 1.0× and 1.3× text, English and Hindi, and an end-to-end test: fresh install → wizard → enrolment → gate mark → unlock → correction → export).
+
+| Step | What is in | Notes |
+|---|---|---|
+| F1 | Tokens, `SgTheme`, all adaptive components in §4.4, plus a dev component catalogue (debug panel → *Component catalogue*) (`SgScaffold`, `SgTopBar`, `SgNavBar`, buttons, fields, chips, switches, sheets, PIN pad, gate and capture widgets) | Icons use Material outline icons for now (D-3 open) |
+| F2 | `sg_domain` entities, repository contracts, `Result`, role table, attendance rules; fakes and seed; `AppModeController`; router with mode redirects; admin shell with the paused banner; idle auto-return | Seed: 25 workers, Day and Night shifts, today's marks, a month of history, 4 open exceptions |
+| F3 | Gate: scanning, matched, not recognised, cooldown, paused, manual entry; wake lock and dimming; voice; kiosk warning; debug panel | |
+| F4 | Setup wizard (language, licence, first shift, camera and light, pin to screen, owner PIN + recovery code, first worker) and admin unlock (PIN, lockout back-off, biometrics, recovery-code reset) | |
+| F5 | Today, Workers, worker profile, enrolment (details, privacy notice, face capture with duplicate handling), Exceptions with correct-record sheet, Reports (daily, monthly muster, full grid, Excel/Tally export), Settings hub, Backup & device (first-backup passphrase), shifts, users and PINs, Tally mapping, gate settings, language, privacy pack, about | Screens without a design (D-1) were built from the plan's description; they are marked below |
+
+**Decisions made while building**
+- **FE-3:** languages without strings (gu, ta, pa, mr) are shown in the list as "Coming soon" and cannot be chosen.
+- **No code generation yet.** Providers, routes and state classes are written by hand (plain Riverpod 3 `Notifier`s, plain `GoRoute`s) instead of `riverpod_generator`, `freezed` and `go_router_builder`. This keeps the build free of `build_runner`; it can move to generators later without changing screens.
+- **Gate type sizes were re-measured from the design PNGs.** The plan's prompt and clock sizes (§4.2) are export pixels (2×) and were halved; see `SgText`.
+- **Setup has 7 screens but shows "Step n of 6"**, as in the designs: the owner PIN and the first worker share step 6.
+- **A night-shift worker's marks are stored on the calendar day** in the fakes. Shift dates (a night shift that spans two dates) belong to the shift engine (E08).
+- A gate operator signs in to a limited Today (numbers, Start gate mode, Manual entry) with no tabs.
+
+**Built without a design (D-1), to be checked by Design:** first shift, owner PIN + recovery code, first worker, the "Gate is paused" banner, cooldown state, Settings hub, Shifts & rules, Users & PINs, worker profile, backup passphrase, Tally mapping, gate settings, privacy pack, about, licence banners, forgot-PIN reset, duplicate-face dialog.
+
+**Not done yet (needs assets, a Mac, or the back ends)**
+- Bundled fonts (IBM Plex Sans, Devanagari and the regional Noto fonts, plus OFL files). Text uses the platform font until they are added; widget tests load Roboto from the SDK so layouts are realistic, but Devanagari width in tests is approximate.
+- Golden tests (`alchemist`) on a Linux runner and the manual side-by-side check against the designs on a real Android phone and iPhone.
+- iOS flavour schemes and any iOS run (FE-2). The iOS look is covered by widget tests only.
+- `local_auth`, `wakelock_plus`, `just_audio`/`flutter_tts`, `share_plus`, `mobile_scanner`, `device_info_plus`: all sit behind `sg_platform` interfaces with recording fakes.
+- Staging and prod entry points start with no services bound (they report "not wired" until F6).
+- Hindi strings are a first draft for a native speaker to review; the legal basis on the notice is still `[CONSENT OR LEGITIMATE USE — TBD]` (L-1).
 
 ---
 
@@ -410,9 +453,9 @@ Golden tests run on Linux CI, so both platform looks are verified without a Mac.
 
 | ID | Item | Needed by | Owner |
 |---|---|---|---|
-| FE-1 | Riverpod 3 instead of 2 (amend ADR-0003) | F0 | TL |
+| FE-1 | ~~Riverpod 3 instead of 2 (amend ADR-0003)~~ **Settled in F0:** Riverpod 3, ADR-0003 amended | F0 | TL |
 | FE-2 | **Mac access** for iOS schemes, signing, simulator and device runs. Development happens on Windows today. | F0 (schemes), F3 (first iOS run) | Eng lead |
-| FE-3 | Show not-yet-translated languages in step 1 as "coming soon", or hide them? | F4 | Product |
+| FE-3 | ~~Show not-yet-translated languages in step 1 as "coming soon", or hide them?~~ **Settled in F4:** shown as "Coming soon", not selectable | F4 | Product |
 | D-1 | **Missing designs:** setup step 3 (first shift), setup step 6 (owner PIN + recovery code + first worker), gate cooldown state, "Gate is paused" admin banner, Settings hub, Shifts & rules, Users & PINs, worker profile (deactivate / re-enrol / delete / data summary), backup passphrase, restore, Tally mapping, licence states, camera-permission rationale, duplicate-face dialog, empty states. E05-T05 covers some of these. | Before the matching F-step | Design |
 | D-2 | Exact hex values marked ≈ in §4.1 (yellow tint, gate card, gate muted, bright green) | F1 | Design |
 | D-3 | Icon set export format (icon font vs SVG + `flutter_svg`) | F1 | Design + FE |
