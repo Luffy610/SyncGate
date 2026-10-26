@@ -1,0 +1,5 @@
+{
+  "BUILD_FLAVOUR": "dev",
+  "LICENCE_BASE_URL": "https://licence.dev.syncgate.in",
+  "SENTRY_DSN": ""
+}
