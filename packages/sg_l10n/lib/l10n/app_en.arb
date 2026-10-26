@@ -1,0 +1,1229 @@
+{
+  "@@locale": "en",
+  "app_name": "SyncGate",
+  "@app_name": {
+    "description": "Product name. Not translated."
+  },
+  "common_cancel": "Cancel",
+  "common_back": "Back",
+  "common_save": "Save",
+  "common_continue": "Continue",
+  "common_next": "Next",
+  "common_close": "Close",
+  "common_retry": "Retry",
+  "common_add": "Add",
+  "common_all": "All",
+  "common_none": "None",
+  "common_optional": "Optional",
+  "common_error": "Something went wrong.",
+  "common_comingSoon": "Coming soon",
+  "common_notAllowed": "You don't have access to this.",
+  "attendance_in": "IN",
+  "attendance_out": "OUT",
+  "role_owner": "Owner",
+  "role_admin": "Admin",
+  "role_gateOperator": "Gate operator",
+  "nav_today": "Today",
+  "nav_workers": "Workers",
+  "nav_reports": "Reports",
+  "nav_settings": "Settings",
+  "shell_gatePaused_message": "Gate is paused — workers can't mark attendance",
+  "shell_gatePaused_action": "Back to gate",
+  "gate_status_offline": "Offline · saved on this phone",
+  "gate_liveness_on": "Liveness check on",
+  "gate_header_languageSemantic": "Change gate language",
+  "gate_header_lock": "Admin unlock",
+  "gate_kiosk_warning": "Not pinned — tap the lock to fix",
+  "gate_kiosk_warningIos": "Guided Access is off",
+  "gate_scan_prompt": "Look at the screen",
+  "gate_scan_hint": "no need to touch",
+  "gate_footer_shift": "{shift} shift · {window}",
+  "@gate_footer_shift": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "window": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_footer_marked": "{marked} of {total} marked IN",
+  "@gate_footer_marked": {
+    "placeholders": {
+      "marked": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gate_footer_notYet": "{count} not yet",
+  "@gate_footer_notYet": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gate_footer_lastMark": "Last mark · {code} · {department}",
+  "@gate_footer_lastMark": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "department": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_footer_noMarks": "No marks yet today",
+  "gate_matched_greetingIn": "Welcome, {name}",
+  "@gate_matched_greetingIn": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_matched_greetingOut": "Goodbye, {name}",
+  "@gate_matched_greetingOut": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_matched_onTime": "on time",
+  "gate_matched_late": "late",
+  "gate_voice_in": "{name}, IN",
+  "@gate_voice_in": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_voice_out": "{name}, OUT",
+  "@gate_voice_out": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_voice_caption": "Voice: “{phrase}”",
+  "@gate_voice_caption": {
+    "placeholders": {
+      "phrase": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_notRecognised_title": "Not recognised",
+  "gate_notRecognised_retry": "Trying again in {seconds} s.",
+  "@gate_notRecognised_retry": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "gate_notRecognised_tryAgain": "Try again",
+  "gate_notRecognised_pickWorker": "Guard: pick worker from list",
+  "gate_hint_default": "Take off the helmet or come a little closer, then look again.",
+  "gate_hint_tooDark": "Move closer to the light, then look again.",
+  "gate_hint_backlight": "Turn away from the bright light behind you.",
+  "gate_hint_tooFar": "Come a little closer to the screen.",
+  "gate_hint_turnLess": "Face the screen straight on.",
+  "gate_hint_blurry": "Hold still for a moment.",
+  "gate_hint_covered": "Take off the helmet or mask, then look again.",
+  "gate_hint_dirtyLens": "The camera lens may be dirty — ask the guard to wipe it.",
+  "gate_cooldown_title": "Already marked {direction} at {time}",
+  "@gate_cooldown_title": {
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_cooldown_hint": "Nothing was saved again.",
+  "gate_paused_title": "Gate is paused",
+  "gate_paused_camera": "The camera isn't available. Check the camera permission.",
+  "gate_manual_title": "Manual entry",
+  "gate_manual_subtitle": "Guard {operator} · tap the worker at the gate",
+  "@gate_manual_subtitle": {
+    "placeholders": {
+      "operator": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_manual_flagged": "Flagged in reports",
+  "gate_manual_search": "Search name or worker ID",
+  "gate_manual_notMarked": "Not marked yet · {count}",
+  "@gate_manual_notMarked": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "gate_manual_reasonHeader": "Reason (required)",
+  "gate_manual_save": "Save {direction} · {name}",
+  "@gate_manual_save": {
+    "placeholders": {
+      "direction": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_manual_saveEmpty": "Save",
+  "gate_manual_empty": "Everyone is marked.",
+  "gate_manual_limit": "{name} already has 3 manual entries today. Ask an admin to review.",
+  "@gate_manual_limit": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "gate_manual_saved": "Saved: {name} marked {direction}",
+  "@gate_manual_saved": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "direction": {
+        "type": "String"
+      }
+    }
+  },
+  "reason_notRecognised": "Not recognised",
+  "reason_maskHelmet": "Mask / helmet",
+  "reason_injury": "Injury",
+  "reason_cameraIssue": "Camera issue",
+  "reason_newWorker": "New worker not enrolled",
+  "setup_stepOf": "Step {step} of {total}",
+  "@setup_stepOf": {
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_language_title": "Choose a language",
+  "setup_language_body": "Used for setup, the voice at the gate and worker notices. Each admin and worker can pick their own later.",
+  "setup_licence_title": "Activate your licence",
+  "setup_licence_body": "The key is on your invoice and in the WhatsApp message from SyncGate.",
+  "setup_licence_keyLabel": "Licence key",
+  "setup_licence_keyHelper": "One licence covers this device and any number of workers.",
+  "setup_licence_scanQr": "Scan QR on invoice",
+  "setup_licence_offline": "After activation everything works without internet. SyncGate checks the licence whenever the device is online — no worker data is ever sent.",
+  "setup_licence_activate": "Activate",
+  "setup_licence_trial": "No key yet? Start 30-day free trial",
+  "setup_licence_invalid": "That key doesn't look right. Check it and try again.",
+  "setup_licence_noInternet": "No internet. Activation needs a connection — or start the free trial and activate later.",
+  "setup_licence_trialInstead": "Start trial instead",
+  "setup_licence_scanned": "Key read from the QR code",
+  "setup_device_title": "This device",
+  "setup_device_ready": "Ready",
+  "setup_device_limits": "Works with limits",
+  "setup_device_camera": "Front camera",
+  "setup_device_cameraValue": "{count} MP",
+  "@setup_device_cameraValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_device_memory": "Memory",
+  "setup_device_memoryValue": "{count} GB",
+  "@setup_device_memoryValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_device_system": "System",
+  "setup_shift_title": "Set up your first shift",
+  "setup_shift_body": "You can change this later, or add a night shift, in Settings.",
+  "shift_name": "Shift name",
+  "shift_starts": "Starts",
+  "shift_ends": "Ends",
+  "shift_endsNextDay": "Ends the next day",
+  "shift_grace": "Grace time",
+  "shift_graceValue": "{minutes} min",
+  "@shift_graceValue": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "shift_graceHelp": "Arrivals up to this long after the start still count as on time.",
+  "shift_weeklyOff": "Weekly off",
+  "shift_nameRequired": "Give the shift a name.",
+  "shift_sameTimes": "Start and end can't be the same time.",
+  "shift_pickTime": "Choose a time",
+  "weekday_1": "Monday",
+  "weekday_2": "Tuesday",
+  "weekday_3": "Wednesday",
+  "weekday_4": "Thursday",
+  "weekday_5": "Friday",
+  "weekday_6": "Saturday",
+  "weekday_7": "Sunday",
+  "setup_camera_title": "Check camera & light",
+  "setup_camera_body": "Put the phone on a stand at eye level by the gate, then stand where workers will stand.",
+  "setup_camera_live": "Live preview",
+  "setup_camera_lightChipLow": "Light low · {lux} lux",
+  "@setup_camera_lightChipLow": {
+    "placeholders": {
+      "lux": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_camera_lightChipOk": "Light good · {lux} lux",
+  "@setup_camera_lightChipOk": {
+    "placeholders": {
+      "lux": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_camera_light": "Light",
+  "setup_camera_lightLow": "Low",
+  "setup_camera_lightGood": "Good",
+  "setup_camera_lightAdvice": "Switch on a tube light near the gate, or keep the screen fill light on.",
+  "setup_camera_backlight": "Backlight",
+  "setup_camera_backlightNone": "None",
+  "setup_camera_backlightYes": "Too bright behind",
+  "setup_camera_lens": "Lens",
+  "setup_camera_lensClean": "Clean",
+  "setup_camera_lensDirty": "Needs wiping",
+  "setup_camera_faceSize": "Face size",
+  "setup_camera_faceSizeGood": "Good at {cm} cm",
+  "@setup_camera_faceSizeGood": {
+    "placeholders": {
+      "cm": {
+        "type": "int"
+      }
+    }
+  },
+  "setup_camera_faceSizeBad": "Move closer or step back",
+  "setup_camera_fillLight": "Screen fill light",
+  "setup_camera_fillLightHelp": "Lights faces with a white screen when dark",
+  "setup_camera_checkAgain": "Check again",
+  "setup_camera_checking": "Checking…",
+  "setup_kiosk_title": "Pin SyncGate to the screen",
+  "setup_kiosk_body": "Keeps this phone in SyncGate while it sits at the gate. Unlock it with your PIN to enrol workers or run reports.",
+  "setup_kiosk_howTo": "How to",
+  "setup_kiosk_statusOff": "App pinning off",
+  "setup_kiosk_statusOn": "App pinned",
+  "setup_kiosk_statusOffIos": "Guided Access off",
+  "setup_kiosk_statusOnIos": "Guided Access on",
+  "setup_kiosk_step1": "Open Settings › Security › App pinning",
+  "setup_kiosk_step1Sub": "On some tablets: Settings › Biometrics & security.",
+  "setup_kiosk_step2": "Turn it on, with “Ask for PIN before unpinning”",
+  "setup_kiosk_step2Sub": "Use a PIN only you know — not the gate PIN.",
+  "setup_kiosk_step3": "Come back and tap “Pin SyncGate now”",
+  "setup_kiosk_step3Sub": "The phone now stays in SyncGate.",
+  "setup_kiosk_iosStep1": "Open Settings › Accessibility › Guided Access",
+  "setup_kiosk_iosStep1Sub": "Turn Guided Access on and set a passcode only you know.",
+  "setup_kiosk_iosStep2": "Come back to SyncGate",
+  "setup_kiosk_iosStep2Sub": "Stay on the gate screen.",
+  "setup_kiosk_iosStep3": "Triple-click the side button and tap Start",
+  "setup_kiosk_iosStep3Sub": "The phone now stays in SyncGate.",
+  "setup_kiosk_pinNow": "Pin SyncGate now",
+  "setup_kiosk_openSettings": "Open Settings",
+  "setup_kiosk_skip": "Skip for now",
+  "setup_owner_createTitle": "Create your owner PIN",
+  "setup_owner_createBody": "You'll use this 6-digit PIN to open Admin from the gate. Don't share it with the guard.",
+  "setup_owner_confirmTitle": "Enter the PIN again",
+  "setup_owner_confirmBody": "Type the same 6 digits to confirm.",
+  "setup_owner_mismatch": "The PINs don't match. Start again.",
+  "setup_owner_recoveryTitle": "Write down your recovery code",
+  "setup_owner_recoveryBody": "If you forget your PIN, this code is the only way back in. We can't recover it for you. It is shown only once.",
+  "setup_owner_recoveryCheck": "I've written it down",
+  "setup_owner_recoveryCheckSub": "Keep it somewhere safe, away from the gate phone.",
+  "setup_firstWorker_title": "Enrol your first worker",
+  "setup_firstWorker_body": "Add one worker now to try the gate, or do it later from the Workers tab.",
+  "setup_firstWorker_enrol": "Enrol first worker",
+  "setup_firstWorker_later": "Later — go to the gate",
+  "unlock_title": "Admin access",
+  "unlock_prompt": "Enter your 6-digit PIN",
+  "unlock_backToGate": "Back to gate",
+  "unlock_delete": "Delete",
+  "unlock_useFingerprint": "Use fingerprint",
+  "unlock_useFaceId": "Use Face ID",
+  "unlock_biometricReason": "Unlock SyncGate admin",
+  "unlock_footer": "Gate operators can fix gate issues but can't see reports or export data.",
+  "unlock_wrong": "Wrong PIN. {count, plural, =1{1 try left} other{{count} tries left}}.",
+  "@unlock_wrong": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unlock_lockedOut": "Too many tries. Try again in {time}.",
+  "@unlock_lockedOut": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "unlock_forgot": "Forgot PIN?",
+  "unlock_reset_title": "Reset owner PIN",
+  "unlock_reset_code": "Recovery code",
+  "unlock_reset_newPin": "New 6-digit PIN",
+  "unlock_reset_confirm": "Reset PIN",
+  "unlock_reset_failed": "That recovery code isn't right.",
+  "unlock_reset_done": "PIN reset. Sign in with the new PIN.",
+  "today_title": "Today",
+  "today_shift_running": "{shift} shift is running",
+  "@today_shift_running": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "today_shift_upcoming": "{shift} shift starts at {time}",
+  "@today_shift_upcoming": {
+    "placeholders": {
+      "shift": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "today_shift_expected": "{window} · {count, plural, =1{1 worker} other{{count} workers}} expected",
+  "@today_shift_expected": {
+    "placeholders": {
+      "window": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_offlineOk": "Offline OK",
+  "today_startGate": "Start gate mode",
+  "today_stat_present": "Present",
+  "today_stat_presentOf": "of {count} expected",
+  "@today_stat_presentOf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_stat_absent": "Absent",
+  "today_stat_onLeave": "{count} on leave",
+  "@today_stat_onLeave": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_stat_late": "Late",
+  "today_stat_after": "after {time}",
+  "@today_stat_after": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "today_stat_onPremises": "On premises",
+  "today_stat_wentOut": "{count} went OUT",
+  "@today_stat_wentOut": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_title": "{count, plural, =1{1 record needs review} other{{count} records need review}}",
+  "@today_review_title": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_manual": "{count} manual",
+  "@today_review_manual": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_missingOut": "{count} missing OUT",
+  "@today_review_missingOut": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_clock": "{count} clock change",
+  "@today_review_clock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_other": "{count} other",
+  "@today_review_other": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "today_review_clear": "All clear",
+  "today_review_clearSub": "Nothing needs review right now.",
+  "backup_when": "{days, plural, =0{today} =1{yesterday} other{{days} days ago}}",
+  "@backup_when": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "today_backup_last": "Last backup {when}",
+  "@today_backup_last": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "today_backup_never": "No backup yet",
+  "today_backup_action": "Back up",
+  "today_enrol": "Enrol worker",
+  "today_operator_manual": "Manual entry",
+  "licence_banner_trial": "Free trial · {days, plural, =1{1 day} other{{days} days}} left",
+  "@licence_banner_trial": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "licence_banner_overdue": "Licence check overdue — connect to the internet soon.",
+  "licence_banner_restricted": "Licence restricted — the gate keeps working for 7 more days.",
+  "licence_banner_revoked": "This licence was revoked. Exports and backups still work.",
+  "workers_title": "Workers",
+  "workers_search": "Search name or ID",
+  "workers_filter_all": "All {count}",
+  "@workers_filter_all": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workers_filter_notIn": "Not in {count}",
+  "@workers_filter_notIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workers_filter_needsFace": "Needs face {count}",
+  "@workers_filter_needsFace": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "workers_status_needsFace": "Needs face",
+  "workers_status_in": "IN {time}",
+  "@workers_status_in": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "workers_status_out": "OUT {time}",
+  "@workers_status_out": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "workers_status_notIn": "Not in",
+  "workers_status_onLeave": "On leave",
+  "workers_status_inactive": "Inactive",
+  "workers_row_sub": "{code} · {department} · {shift}",
+  "@workers_row_sub": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      },
+      "department": {
+        "type": "String"
+      },
+      "shift": {
+        "type": "String"
+      }
+    }
+  },
+  "workers_empty": "No workers yet",
+  "workers_emptySub": "Enrol your first worker to start marking attendance.",
+  "workers_noMatch": "No workers match your search.",
+  "profile_section_details": "Details",
+  "profile_section_face": "Face",
+  "profile_section_data": "Data held",
+  "profile_age": "Age {age}",
+  "@profile_age": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "profile_today": "Today",
+  "profile_face_enrolled": "Face code saved on this phone",
+  "profile_face_needs": "No face code yet",
+  "profile_captureFace": "Capture face",
+  "profile_reenrol": "Re-enrol face",
+  "profile_deactivate": "Deactivate worker",
+  "profile_reactivate": "Reactivate worker",
+  "profile_deactivate_title": "Deactivate {name}?",
+  "@profile_deactivate_title": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_deactivate_message": "They will no longer be expected at the gate. Their records are kept.",
+  "profile_delete": "Delete worker and data",
+  "profile_delete_title": "Delete {name}?",
+  "@profile_delete_title": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "profile_delete_message": "This erases the worker, the face code and all attendance records on this phone. It cannot be undone.",
+  "profile_delete_confirm": "Delete",
+  "profile_dataSummary": "Name, ID, department, shift, attendance marks and one face code. The face code never leaves this phone.",
+  "profile_consent": "Privacy notice agreed",
+  "profile_noConsent": "No notice recorded",
+  "profile_notFound": "This worker no longer exists.",
+  "enrol_title": "New worker",
+  "enrol_step_details": "Details",
+  "enrol_step_notice": "Notice",
+  "enrol_step_face": "Face",
+  "enrol_section_worker": "Worker",
+  "enrol_section_work": "Work",
+  "enrol_section_contact": "Contact & language",
+  "enrol_field_name": "Full name",
+  "enrol_field_code": "Worker ID",
+  "enrol_field_codeHelp": "Auto-assigned. You can change it.",
+  "enrol_field_dob": "Date of birth",
+  "enrol_field_dobHint": "DD-MM-YYYY",
+  "enrol_field_department": "Department",
+  "enrol_field_designation": "Designation",
+  "enrol_field_shift": "Shift group",
+  "enrol_field_contractor": "Contractor",
+  "enrol_field_contractorNone": "None (optional)",
+  "enrol_field_phone": "Phone",
+  "enrol_field_phoneHint": "Optional",
+  "enrol_field_language": "Language",
+  "enrol_field_languageHelp": "Notices and voice prompts for this worker use this language.",
+  "enrol_age_ok": "✓ Age {age} — must be 18 or older to enrol",
+  "@enrol_age_ok": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "enrol_age_under": "Age {age} — must be 18 or older to enrol. This worker can't be enrolled.",
+  "@enrol_age_under": {
+    "placeholders": {
+      "age": {
+        "type": "int"
+      }
+    }
+  },
+  "enrol_dob_invalid": "Enter the date as DD-MM-YYYY.",
+  "enrol_code_taken": "That worker ID is already used.",
+  "enrol_name_required": "Enter the worker's name.",
+  "enrol_required": "Required",
+  "enrol_department_add": "Add new department",
+  "enrol_department_newTitle": "New department",
+  "enrol_department_newLabel": "Department name",
+  "notice_title": "Privacy notice",
+  "notice_showTo": "Show to {name} in their language",
+  "@notice_showTo": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "notice_listen": "Read aloud",
+  "notice_content_title": "About your attendance record",
+  "notice_s1_title": "What is kept, and why",
+  "notice_s1_body": "Only for attendance and pay: name, ID, department, shift, in and out times, and one face code. Your photo is not kept.",
+  "notice_s2_title": "Where it stays",
+  "notice_s2_body": "Only on this phone, locked. The face code never goes to the internet, a backup or another phone.",
+  "notice_s3_title": "Your rights",
+  "notice_s3_body": "See your record, get mistakes corrected, and have your face code deleted when you leave the job.",
+  "notice_s4_title": "To complain",
+  "notice_s4_body": "Speak to the owner, or use the contact on the notice board. [GRIEVANCE CONTACT — TBD]",
+  "notice_agree": "I have heard or read this notice and I agree",
+  "notice_agreeSub": "Worker has heard or read this notice and agrees",
+  "notice_saved": "Saved with the time, the notice language and your admin ID. Legal basis: {basis}",
+  "@notice_saved": {
+    "placeholders": {
+      "basis": {
+        "type": "String"
+      }
+    }
+  },
+  "notice_continue": "Agree & capture face",
+  "capture_step": "Step 3 of 3",
+  "capture_hint_tooDark": "Too dark — move closer to the light",
+  "capture_hint_backlight": "Light is behind you — turn around",
+  "capture_hint_tooFar": "Too far — come closer",
+  "capture_hint_turnLess": "Turn your head a little less",
+  "capture_hint_blurry": "Hold still",
+  "capture_hint_covered": "Remove cap, mask or glasses",
+  "capture_hint_dirtyLens": "The camera lens looks dirty",
+  "capture_turn_front": "Look straight at the camera",
+  "capture_turn_left": "Slowly turn your head left",
+  "capture_turn_right": "Slowly turn your head right",
+  "capture_turn_mask": "Put on your mask or helmet and look straight",
+  "capture_turn_done": "All angles captured",
+  "capture_angle_front": "Front",
+  "capture_angle_left": "Left",
+  "capture_angle_right": "Right",
+  "capture_angle_mask": "Mask",
+  "capture_status_done": "Done",
+  "capture_status_now": "Now",
+  "capture_status_next": "Next",
+  "capture_privacy": "Photos are deleted once the face code is made. The code stays on this phone only.",
+  "capture_skipMask": "Skip mask sample",
+  "capture_processing": "Making the face code…",
+  "capture_enrolled": "{name} enrolled",
+  "@capture_enrolled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "capture_duplicate_title": "This face looks like {name} ({code})",
+  "@capture_duplicate_title": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "capture_duplicate_body": "Each person should be enrolled once. Is this really a different person?",
+  "capture_duplicate_cancel": "Cancel",
+  "capture_duplicate_override": "Override with reason",
+  "capture_duplicate_reasonTitle": "Why is this a different person?",
+  "capture_duplicate_reasonLabel": "Reason",
+  "capture_stop_title": "Stop enrolling {name}?",
+  "@capture_stop_title": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "capture_stop_message": "The details are saved. The worker will show as “Needs face” until you capture it.",
+  "capture_stop_confirm": "Stop",
+  "capture_stop_keep": "Keep going",
+  "exceptions_title": "Exceptions",
+  "exceptions_filter_all": "All {count}",
+  "@exceptions_filter_all": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exceptions_filter_manual": "Manual {count}",
+  "@exceptions_filter_manual": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exceptions_filter_missingOut": "Missing OUT {count}",
+  "@exceptions_filter_missingOut": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exceptions_filter_clock": "Clock {count}",
+  "@exceptions_filter_clock": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exceptions_filter_other": "Other {count}",
+  "@exceptions_filter_other": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exception_tag_missingOut": "MISSING OUT",
+  "exception_tag_manual": "MANUAL",
+  "exception_tag_clock": "CLOCK",
+  "exception_tag_lowMargin": "LOW MARGIN",
+  "exception_tag_duplicate": "DUPLICATE",
+  "exception_tag_spoofSuspect": "SPOOF SUSPECT",
+  "exception_tag_livenessActive": "LIVENESS ACTIVE",
+  "exception_detail_missingOut": "IN {time} by face · no OUT mark",
+  "@exception_detail_missingOut": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "exception_detail_manual": "Guard {actor} · reason: {reason}",
+  "@exception_detail_manual": {
+    "placeholders": {
+      "actor": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "exception_detail_other": "Needs a look before payroll",
+  "exception_clock_title": "Device clock moved back {minutes} min",
+  "@exception_clock_title": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "exception_clock_detail": "{count} events flagged · check before payroll",
+  "@exception_clock_detail": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "exceptions_empty": "All clear",
+  "exceptions_emptySub": "Nothing needs review right now.",
+  "exceptions_resolved": "Reviewed",
+  "correct_title": "Correct record",
+  "correct_dateLine": "{date} · {shift} shift · {department}",
+  "@correct_dateLine": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "shift": {
+        "type": "String"
+      },
+      "department": {
+        "type": "String"
+      }
+    }
+  },
+  "correct_inFace": "IN · FACE",
+  "correct_inManual": "IN · MANUAL",
+  "correct_outNew": "OUT · NEW",
+  "correct_outTime": "OUT time",
+  "correct_reason": "Reason (required)",
+  "correct_reason_pick": "Choose a reason",
+  "correct_reason_forgotOut": "Forgot to mark OUT — supervisor confirmed",
+  "correct_reason_faceFailed": "Face not recognised — verified by supervisor",
+  "correct_reason_wrongDirection": "Wrong direction was recorded",
+  "correct_reason_other": "Other…",
+  "correct_reason_otherTitle": "Other reason",
+  "correct_audit": "Audit log will record: OUT {before} → {after}, by {actor}, {when}. Shows in the exceptions report.",
+  "@correct_audit": {
+    "placeholders": {
+      "before": {
+        "type": "String"
+      },
+      "after": {
+        "type": "String"
+      },
+      "actor": {
+        "type": "String"
+      },
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "correct_none": "none",
+  "correct_save": "Save correction",
+  "correct_saved": "Record corrected",
+  "review_title": "Review",
+  "review_markReviewed": "Mark reviewed",
+  "review_reviewed": "Marked as reviewed",
+  "reports_title": "Reports",
+  "reports_daily": "Daily",
+  "reports_monthly": "Monthly muster",
+  "reports_filter_dept": "Dept: {value}",
+  "@reports_filter_dept": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_filter_shift": "Shift: {value}",
+  "@reports_filter_shift": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_filter_contractor": "Contractor: {value}",
+  "@reports_filter_contractor": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_summary": "{workers, plural, =1{1 worker} other{{workers} workers}} · {days, plural, =1{1 working day} other{{days} working days}}",
+  "@reports_summary": {
+    "placeholders": {
+      "workers": {
+        "type": "int"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "reports_seeAll": "See all",
+  "reports_col_worker": "WORKER",
+  "reports_col_present": "P",
+  "reports_col_absent": "A",
+  "reports_col_late": "LATE",
+  "reports_col_overtime": "OT H",
+  "reports_flagged": "Has records that need review",
+  "reports_empty": "No records for this month",
+  "reports_emptySub": "Pick another month or filter.",
+  "reports_export_header": "Export for payroll",
+  "reports_export_excel": "Excel (.xlsx)",
+  "reports_export_excelSub": "Template: Payroll — default columns",
+  "reports_export_tally": "Tally Prime (XML)",
+  "reports_export_tallySub": "{matched} of {total} matched to Tally employees · {toMap} to map",
+  "@reports_export_tallySub": {
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "toMap": {
+        "type": "int"
+      }
+    }
+  },
+  "reports_export_tallyAllMatched": "All {total} matched to Tally employees",
+  "@reports_export_tallyAllMatched": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "reports_export_action": "Export & share",
+  "reports_export_confirmTitle": "{count, plural, =1{1 record still needs review} other{{count} records still need review}}",
+  "@reports_export_confirmTitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "reports_export_confirmMessage": "They will be marked with a flag in the export.",
+  "reports_export_confirmGo": "Export anyway",
+  "reports_export_confirmReview": "Review first",
+  "reports_export_progress": "Preparing the file…",
+  "reports_export_shared": "File ready: {file}",
+  "@reports_export_shared": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_menu": "More",
+  "reports_menu_tally": "Tally mapping",
+  "reports_menu_templates": "Column templates",
+  "reports_pickMonth": "Choose a month",
+  "reports_daily_title": "Attendance on {date}",
+  "@reports_daily_title": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_daily_in": "IN",
+  "reports_daily_out": "OUT",
+  "reports_daily_hours": "{hours} h",
+  "@reports_daily_hours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "reports_status_P": "Present",
+  "reports_status_A": "Absent",
+  "reports_status_L": "Late",
+  "reports_muster_title": "Monthly muster",
+  "reports_muster_legend": "P present · A absent · L late · WO weekly off",
+  "settings_title": "Settings",
+  "settings_backup": "Backup & device",
+  "settings_shifts": "Shifts & rules",
+  "settings_users": "Users & PINs",
+  "settings_language": "Language",
+  "settings_tally": "Tally mapping",
+  "settings_gate": "Gate settings",
+  "settings_privacy": "Privacy & DPDP pack",
+  "settings_about": "About SyncGate",
+  "settings_section_workplace": "Workplace",
+  "settings_section_app": "App",
+  "settings_signedIn": "Signed in as {role}",
+  "@settings_signedIn": {
+    "placeholders": {
+      "role": {
+        "type": "String"
+      }
+    }
+  },
+  "backup_title": "Backup & device",
+  "backup_hero_details": "{when} · {destination}",
+  "@backup_hero_details": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "backup_hero_none": "Back up now so a lost phone does not lose your records.",
+  "backup_now": "Back up now",
+  "backup_inProgress": "Backing up…",
+  "backup_done": "Backup saved",
+  "backup_section": "Backup",
+  "backup_auto": "Auto backup to Google Drive",
+  "backup_autoSub": "{account} · when online",
+  "@backup_autoSub": {
+    "placeholders": {
+      "account": {
+        "type": "String"
+      }
+    }
+  },
+  "backup_account": "[OWNER’S GOOGLE ACCOUNT]",
+  "backup_file": "Save backup file",
+  "backup_fileSub": "Share by USB, WhatsApp or email",
+  "backup_remind": "Remind me after",
+  "backup_remindSub": "If no backup is taken",
+  "backup_remindValue": "{days, plural, =1{1 day} other{{days} days}}",
+  "@backup_remindValue": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "backup_privacy": "Backups never include face codes. On a new phone, workers look at the camera once more; their details and history come back.",
+  "backup_section_licence": "Licence & device",
+  "backup_licence": "Licence",
+  "backup_licenceActive": "Active · to {date}",
+  "@backup_licenceActive": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backup_licenceTrial": "Trial · to {date}",
+  "@backup_licenceTrial": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "backup_licenceNone": "Not activated",
+  "backup_licenceState": "Needs attention",
+  "backup_move": "Move to a new phone",
+  "backup_move_title": "Move to a new phone",
+  "backup_move_message": "Back up first, then install SyncGate on the new phone and choose “Restore from backup”. The licence moves with it. Workers will need to look at the camera again.",
+  "backup_move_confirm": "Back up and continue",
+  "backup_lost": "Report phone lost or stolen",
+  "backup_lost_title": "Report this phone lost or stolen?",
+  "backup_lost_message": "The licence is released so you can use it on a new phone. Face codes were never in backups, so nothing sensitive leaves with the phone.",
+  "backup_lost_confirm": "Report",
+  "backup_lost_done": "Reported. The licence will be released when this phone is online.",
+  "passphrase_title": "Set a backup passphrase",
+  "passphrase_body": "Backups are locked with this passphrase. We suggest four words you can remember.",
+  "passphrase_suggest": "Suggested",
+  "passphrase_another": "Suggest another",
+  "passphrase_confirm": "Type it again to confirm",
+  "passphrase_mismatch": "The passphrases don't match.",
+  "passphrase_ack": "I understand SyncGate cannot recover this passphrase",
+  "passphrase_save": "Save and back up",
+  "shifts_title": "Shifts & rules",
+  "shifts_add": "Add a shift",
+  "shifts_edit": "Edit shift",
+  "shifts_new": "New shift",
+  "shifts_row_sub": "{window} · grace {minutes} min",
+  "@shifts_row_sub": {
+    "placeholders": {
+      "window": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "users_title": "Users & PINs",
+  "users_changePin": "Change PIN",
+  "users_newPin": "New 6-digit PIN",
+  "users_confirmPin": "Type it again",
+  "users_mismatch": "The PINs don't match.",
+  "users_saved": "PIN changed",
+  "users_note": "Gate operators can fix gate issues but can't see reports or export data. Share the gate operator PIN with the guard only.",
+  "tally_title": "Tally mapping",
+  "tally_body": "Match each worker to their employee name in Tally Prime so the export imports cleanly.",
+  "tally_matched": "Matched",
+  "tally_toMap": "To map",
+  "tally_enter": "Tally employee name",
+  "tally_summary": "{matched} of {total} matched",
+  "@tally_summary": {
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "gateSettings_title": "Gate settings",
+  "gateSettings_autoReturn": "Return to gate after",
+  "gateSettings_autoReturnSub": "When Admin is left untouched",
+  "gateSettings_cooldown": "Repeat mark ignored for",
+  "gateSettings_cooldownSub": "After someone has been marked",
+  "gateSettings_minutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}",
+  "@gateSettings_minutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "gateSettings_volume": "Voice volume",
+  "gateSettings_volumeLow": "Low",
+  "gateSettings_volumeMedium": "Medium",
+  "gateSettings_volumeHigh": "High",
+  "gateSettings_fillLight": "Screen fill light",
+  "gateSettings_clock24": "24-hour clock",
+  "gateSettings_biometric": "Fingerprint / Face ID unlock",
+  "privacy_title": "Privacy & DPDP pack",
+  "privacy_notice": "Worker privacy notice",
+  "privacy_noticeSub": "Version {version} · shown before every enrolment",
+  "@privacy_noticeSub": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "privacy_consents": "Notices agreed",
+  "privacy_consentsValue": "{agreed} of {total} workers",
+  "@privacy_consentsValue": {
+    "placeholders": {
+      "agreed": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "privacy_faceStored": "Face codes",
+  "privacy_faceStoredValue": "{count} on this phone only",
+  "@privacy_faceStoredValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "privacy_erase": "Delete a worker's data from Workers › the worker › Delete.",
+  "privacy_grievance": "Grievance contact",
+  "privacy_grievanceValue": "[GRIEVANCE CONTACT — TBD]",
+  "about_title": "About SyncGate",
+  "about_version": "Version",
+  "about_build": "Build",
+  "about_data": "Where data lives",
+  "about_dataValue": "On this phone only",
+  "about_audit": "Audit entries",
+  "language_settings_title": "Language",
+  "language_settings_body": "Used at the gate and by default in Admin. Each worker has their own language for notices and voice."
+}

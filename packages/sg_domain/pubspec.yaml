@@ -1,0 +1,14 @@
+name: sg_domain
+description: Pure Dart domain for SyncGate. No Flutter imports (ADR-0003).
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+
+dependencies:
+  meta: ^1.16.0
+
+dev_dependencies:
+  test: ^1.25.0
