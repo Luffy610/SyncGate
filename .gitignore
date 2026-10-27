@@ -1,0 +1,28 @@
+# OS / editors
+.DS_Store
+*.log
+*.swp
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Dart / Flutter
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+coverage/
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+
+# FVM (the version pin in .fvmrc is committed; the SDK link is not)
+.fvm/
+
+# Generated localisations (run `melos run gen`)
+packages/sg_l10n/lib/src/generated/
+
+# Golden test failures
+**/test/**/failures/

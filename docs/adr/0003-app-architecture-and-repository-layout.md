@@ -83,7 +83,7 @@ syncgate/
 
 | Concern | Choice |
 |---|---|
-| State management | **Riverpod 2** with code generation (`riverpod_generator`). `AsyncNotifier` for use cases; providers scoped per mode. |
+| State management | **Riverpod 3** with code generation (`riverpod_generator`). `AsyncNotifier` for use cases; providers scoped per mode. *(Amended 25-10-2026: originally Riverpod 2; Riverpod 3 is the current stable line with the same model. See frontend plan FE-1.)* |
 | Navigation | **go_router** with a top-level redirect driven by `AppModeController` (`setup` → `gate` ⇄ `admin`). See [ADR-0004](0004-single-device-gate-and-admin-modes.md). |
 | Dependency injection | Riverpod providers only. No service locator. |
 | Immutable models | `freezed` + `json_serializable` for DTOs; plain Dart classes in the domain. |

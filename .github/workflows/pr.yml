@@ -1,0 +1,46 @@
+# Pull-request checks (ADR-0021). F0 scope: format, import boundaries,
+# analyzer and tests. Native, security and golden steps join as they land.
+name: pr
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: pr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  dart:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Read pinned Flutter version
+        run: echo "FLUTTER_VERSION=$(jq -r .flutter .fvmrc)" >> "$GITHUB_ENV"
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: Install Melos
+        run: dart pub global activate melos
+
+      - name: Bootstrap
+        run: melos bootstrap
+
+      - name: Generate code
+        run: melos run gen
+
+      - name: Format
+        run: melos run format:check
+
+      - name: Analyze (incl. import boundaries)
+        run: melos run analyze
+
+      - name: Test
+        run: melos run test
