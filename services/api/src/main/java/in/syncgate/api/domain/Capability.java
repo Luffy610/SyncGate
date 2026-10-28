@@ -25,6 +25,8 @@ public enum Capability {
     CORRECTIONS,
     REPORTS_AND_EXPORTS,
     BACKUP_RESTORE,
+    /** Load a backup into a pristine install (owner, or the first-run setup window). */
+    RESTORE_BACKUP,
     LICENCE_AND_USERS,
     SHIFT_RULES,
     AUDIT_WRITE,
@@ -44,7 +46,7 @@ public enum Capability {
             Role.OWNER, EnumSet.allOf(Capability.class),
             // First-run window, only while no owner exists.
             Role.SETUP, EnumSet.of(READ_CORE, SETTINGS_MODE, SETTINGS_WRITE, ENROL_WORKERS, SHIFT_RULES,
-                    LICENCE_AND_USERS, AUDIT_WRITE, LICENCE_READ));
+                    LICENCE_AND_USERS, AUDIT_WRITE, LICENCE_READ, RESTORE_BACKUP));
 
     public static boolean granted(Role role, Capability capability) {
         return GRANTS.getOrDefault(role, Set.of()).contains(capability);

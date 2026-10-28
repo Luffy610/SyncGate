@@ -89,11 +89,16 @@ public abstract class ApiTest {
     /** Every test starts from a blank database and the demo clock. */
     @BeforeEach
     void resetState() {
+        wipeDatabase();
+        clock.set("2026-10-24T05:52:00+05:30");
+    }
+
+    /** Empties every table, as a brand-new install would be. */
+    protected void wipeDatabase() {
         for (String table : TABLES) {
             jdbc.sql("DELETE FROM " + table).update();
         }
         ReflectionTestUtils.setField(userService, "ownerExists", false);
-        clock.set("2026-10-24T05:52:00+05:30");
     }
 
     // ---- auth helpers ------------------------------------------------------
