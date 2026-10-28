@@ -1,8 +1,8 @@
 -- Production hardening (ADR-0011 section 3): the database itself refuses to
 -- change or delete facts. On H2 (dev and tests) the repositories simply never
 -- issue such statements and the integrity check detects tampering.
--- Backup restore runs as a migration-style bulk load with the triggers off
--- (see RestoreService), inside one transaction.
+-- Restore only ever inserts into an empty database, so these triggers never
+-- get in its way.
 CREATE FUNCTION sg_reject_change() RETURNS trigger AS $$
 BEGIN
     RAISE EXCEPTION 'table % is append-only', TG_TABLE_NAME;

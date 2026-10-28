@@ -62,6 +62,7 @@ CREATE TABLE workers (
                       CHECK (face_status IN ('enrolled', 'needsFace')),
     active        BOOLEAN NOT NULL DEFAULT TRUE,
     on_leave      BOOLEAN NOT NULL DEFAULT FALSE,
+    erased        BOOLEAN NOT NULL DEFAULT FALSE,
     created_at    TIMESTAMP WITH TIME ZONE NOT NULL
 );
 CREATE UNIQUE INDEX ux_workers_code ON workers (code);
