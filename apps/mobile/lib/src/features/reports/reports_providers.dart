@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sg_domain/sg_domain.dart';
 import 'package:syncgate/src/app/providers.dart';
@@ -85,20 +84,3 @@ final Provider<int> workingDaysProvider = Provider.autoDispose<int>((ref) {
   ref.watch(nowProvider.select((n) => n.day));
   return ref.watch(reportServiceProvider).workingDays(filter.month);
 });
-
-@immutable
-class TallyMatch {
-  const new(this.matched, this.total);
-
-  final int matched;
-  final int total;
-
-  int get toMap => total - matched;
-}
-
-final FutureProvider<TallyMatch> tallyMatchProvider =
-    FutureProvider.autoDispose<TallyMatch>((ref) async {
-      ref.watch(workersProvider);
-      final match = await ref.watch(exportServiceProvider).tallyMatch();
-      return TallyMatch(match.matched, match.total);
-    });
