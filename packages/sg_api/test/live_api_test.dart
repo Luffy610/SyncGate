@@ -20,7 +20,7 @@ void main() {
       ? 'set SG_API_URL to run against a live server'
       : null;
 
-  test('first-run setup, gate marks, admin reports, export and backup', () async {
+  test('setup, gate marks, reports, export and backup', () async {
     final saved = <String, List<int>>{};
     final api = ApiBackend(
       baseUrl: url!,
