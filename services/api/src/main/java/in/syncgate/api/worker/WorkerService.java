@@ -30,11 +30,11 @@ public class WorkerService {
     public static final int MINIMUM_AGE = 18;
     private static final Pattern CODE = Pattern.compile("^[A-Za-z0-9-]{1,20}$");
     private static final String COLUMNS = "id, code, name, date_of_birth, department, designation, shift_id, "
-            + "contractor, phone, language, face_status, active, on_leave";
+            + "contractor, phone, language, face_status, active, on_leave, created_at";
 
     public record Worker(UUID id, String code, String name, LocalDate dateOfBirth, String department,
             String designation, UUID shiftId, String contractor, String phone, String language,
-            FaceStatus faceStatus, boolean active, boolean onLeave) {}
+            FaceStatus faceStatus, boolean active, boolean onLeave, LocalDate joinedOn) {}
 
     public record NewWorker(UUID id, String code, String name, LocalDate dateOfBirth, String department,
             String designation, UUID shiftId, String contractor, String phone, String language) {}
@@ -247,6 +247,6 @@ public class WorkerService {
                 rs.getString("designation"), Db.uuid(rs, "shift_id"), rs.getString("contractor"),
                 rs.getString("phone"), rs.getString("language"),
                 Wire.parse(FaceStatus.class, rs.getString("face_status")), rs.getBoolean("active"),
-                rs.getBoolean("on_leave"));
+                rs.getBoolean("on_leave"), Db.instant(rs, "created_at").atZone(java.time.ZoneId.of("Asia/Kolkata")).toLocalDate());
     }
 }

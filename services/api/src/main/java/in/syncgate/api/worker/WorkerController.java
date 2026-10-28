@@ -153,7 +153,7 @@ public class WorkerController {
                 Db.parseId(b.shiftId()), b.contractor(), b.phone(), b.language());
     }
 
-    static WorkerDto dto(WorkerService.Worker w) {
+    public static WorkerDto dto(WorkerService.Worker w) {
         return new WorkerDto(w.id().toString(), w.code(), w.name(), w.dateOfBirth(), w.department(), w.designation(),
                 w.shiftId().toString(), w.contractor(), w.phone(), w.language(), Wire.of(w.faceStatus()), w.active(),
                 w.onLeave());
