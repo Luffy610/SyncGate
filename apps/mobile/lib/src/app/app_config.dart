@@ -10,6 +10,8 @@ final class AppConfig {
     required this.flavour,
     required this.licenceBaseUrl,
     required this.sentryDsn,
+    this.apiBaseUrl = '',
+    this.deviceKey = '',
   });
 
   /// Builds the config for [expected], checking that the env file passed to
@@ -20,6 +22,8 @@ final class AppConfig {
     String declaredFlavour = const String.fromEnvironment('BUILD_FLAVOUR'),
     String licenceBaseUrl = const String.fromEnvironment('LICENCE_BASE_URL'),
     String sentryDsn = const String.fromEnvironment('SENTRY_DSN'),
+    String apiBaseUrl = const String.fromEnvironment('API_BASE_URL'),
+    String deviceKey = const String.fromEnvironment('DEVICE_KEY'),
   }) {
     if (declaredFlavour.isNotEmpty && declaredFlavour != expected.name) {
       final fix = '--dart-define-from-file=env/${expected.name}.json';
@@ -32,12 +36,21 @@ final class AppConfig {
       flavour: expected,
       licenceBaseUrl: licenceBaseUrl,
       sentryDsn: sentryDsn,
+      apiBaseUrl: apiBaseUrl,
+      deviceKey: deviceKey,
     );
   }
 
   final Flavour flavour;
   final String licenceBaseUrl;
   final String sentryDsn;
+
+  /// Base URL of the Spring Boot API (`services/api`), e.g.
+  /// `http://10.0.2.2:8080` from an Android emulator.
+  final String apiBaseUrl;
+
+  /// Secret that lets this phone ask the API for a gate-device token.
+  final String deviceKey;
 
   bool get isProd => flavour == Flavour.prod;
 }

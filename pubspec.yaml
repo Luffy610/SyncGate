@@ -7,6 +7,7 @@ environment:
 
 workspace:
   - apps/mobile
+  - packages/sg_api
   - packages/sg_domain
   - packages/sg_l10n
   - packages/sg_platform

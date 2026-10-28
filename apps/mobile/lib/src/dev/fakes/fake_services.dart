@@ -146,6 +146,21 @@ class FakeBackupService implements BackupService {
     _info.value = BackupInfo(lastBackupAt: _now(), destination: 'Google Drive');
     return Result.ok(_info.value);
   }
+
+  /// The last passphrase set, so tests can check the screen passed it on.
+  String? passphrase;
+
+  @override
+  Future<Result<void, Failure>> setPassphrase(String passphrase) async {
+    this.passphrase = passphrase;
+    return const Result.ok(null);
+  }
+
+  @override
+  Future<Result<int, Failure>> restore({
+    required List<int> file,
+    required String passphrase,
+  }) async => const Result.err(Unexpected('Restore needs the real back end'));
 }
 
 class FakeLicenceService implements LicenceService {

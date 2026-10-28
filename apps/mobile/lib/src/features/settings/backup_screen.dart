@@ -291,6 +291,10 @@ class _PassphraseScreenState extends ConsumerState<PassphraseScreen> {
   bool get _matches => _confirm.text.trim().toLowerCase() == _suggestion;
 
   Future<void> _save() async {
+    final stored = await ref
+        .read(backupServiceProvider)
+        .setPassphrase(_suggestion);
+    if (stored.isErr || !mounted) return;
     await _saveSettings(ref, (s) => s.copyWith(backupPassphraseSet: true));
     if (!mounted) return;
     await runBackup(context, ref);
