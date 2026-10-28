@@ -75,6 +75,7 @@ final Map<String, Object?> workerJson = {
 };
 
 void main() {
+  tallyTests();
   group('uuidFor', () {
     test('real UUIDs pass through, lower-cased', () {
       expect(
@@ -628,3 +629,54 @@ Map<String, Object?> _settings(String mode) => {
   'biometricEnabled': true,
   'backupPassphraseSet': false,
 };
+
+void tallyTests() {
+  group('Tally', () {
+    test('mappings and the match caption come from the server', () async {
+      final s = FakeServer()
+        ..json('GET /api/v1/setup/status', {'hasOwner': false})
+        ..json('GET /api/v1/tally/mappings', {'w1': 'RAMESH KUMAR'})
+        ..json('GET /api/v1/tally/match', {'matched': 23, 'total': 24})
+        ..json(
+          'PUT /api/v1/tally/mappings/w2',
+          <String, Object>{},
+          status: 204,
+        );
+      final api = backend(s);
+      expect(await api.tally.all(), {'w1': 'RAMESH KUMAR'});
+      expect(await api.export.tallyMatch(), (matched: 23, total: 24));
+      await api.tally.set('w2', 'SITA DEVI');
+      final body = jsonDecode(
+        s.to('PUT /api/v1/tally/mappings/w2').single.body,
+      ) as Map<String, Object?>;
+      expect(body, {'name': 'SITA DEVI'});
+    });
+
+    test('a Tally export is saved as .xml with the employee count', () async {
+      String? savedName;
+      final s = FakeServer()
+        ..json('GET /api/v1/setup/status', {'hasOwner': false})
+        ..routes['POST /api/v1/exports'] = (_) => http.Response(
+          '<ENVELOPE/>',
+          200,
+          headers: {
+            'content-disposition':
+                'attachment; filename="SyncGate_Tally_2026-10.xml"',
+            'x-row-count': '23',
+            'x-unmapped': '1',
+          },
+        );
+      final api = backend(s, saver: (name, bytes) async => savedName = name);
+      final result = await api.export.export(
+        ExportFormat.tally,
+        ReportFilter(month: DateTime(2026, 10)),
+      );
+      expect((result as Ok<ExportResult, Failure>).value.rows, 23);
+      expect(savedName, 'SyncGate_Tally_2026-10.xml');
+      final sent = jsonDecode(
+        s.to('POST /api/v1/exports').single.body,
+      ) as Map<String, Object?>;
+      expect(sent['format'], 'tally');
+    });
+  });
+}

@@ -58,7 +58,7 @@ public class BackupService {
     private static final Logger log = LoggerFactory.getLogger(BackupService.class);
 
     /** Insert order respects foreign keys. Backups and keys are deliberately not included. */
-    static final List<String> TABLES = List.of("app_settings", "users", "departments", "shifts", "workers", "consents",
+    static final List<String> TABLES = List.of("app_settings", "users", "departments", "shifts", "workers", "tally_mappings", "consents",
             "attendance_events", "exceptions", "audit_log", "licence", "exports", "chain_heads");
 
     public record BackupInfo(Instant lastBackupAt, String destination) {}

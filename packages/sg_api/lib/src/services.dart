@@ -87,7 +87,11 @@ class ApiExportService implements ExportService {
           RegExp(r'filename\*?=(?:UTF-8\x27\x27)?"?([^";]+)"?')
               .firstMatch(disposition)
               ?.group(1) ??
-          'syncgate-muster.${format == ExportFormat.csv ? 'csv' : 'xlsx'}';
+          'syncgate-muster.${switch (format) {
+            ExportFormat.csv => 'csv',
+            ExportFormat.tally => 'xml',
+            ExportFormat.excel => 'xlsx',
+          }}';
       final path = await _save(name, response.bodyBytes);
       return Result.ok(
         ExportResult(
@@ -98,6 +102,15 @@ class ApiExportService implements ExportService {
     } on ApiError catch (e) {
       return Result.err(failureOf(e));
     }
+  }
+
+  @override
+  Future<({int matched, int total})> tallyMatch() async {
+    final json = await _api.getMap('api/v1/tally/match');
+    return (
+      matched: (json['matched']! as num).toInt(),
+      total: (json['total']! as num).toInt(),
+    );
   }
 }
 

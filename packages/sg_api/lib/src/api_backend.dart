@@ -27,6 +27,7 @@ class ApiBackend {
     users = ApiUserRepository(client, onOwnerCreated: settings.refresh);
     workers = ApiWorkerRepository(client);
     shifts = ApiShiftRepository(client);
+    tally = ApiTallyMappingRepository(client);
     consent = ApiConsentRepository(client);
     exceptions = ApiExceptionRepository(client);
     attendance = ApiAttendanceRepository(
@@ -46,6 +47,7 @@ class ApiBackend {
   late final ApiUserRepository users;
   late final ApiWorkerRepository workers;
   late final ApiShiftRepository shifts;
+  late final ApiTallyMappingRepository tally;
   late final ApiConsentRepository consent;
   late final ApiExceptionRepository exceptions;
   late final ApiAttendanceRepository attendance;

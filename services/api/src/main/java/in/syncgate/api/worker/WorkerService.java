@@ -153,6 +153,7 @@ public class WorkerService {
         Worker worker = require(id);
         int events = jdbc.sql("SELECT COUNT(*) FROM attendance_events WHERE worker_id = :id")
                 .param("id", id).query(Integer.class).single();
+        jdbc.sql("DELETE FROM tally_mappings WHERE worker_id = :id").param("id", id).update();
         if (events == 0) {
             jdbc.sql("DELETE FROM exceptions WHERE worker_id = :id").param("id", id).update();
             jdbc.sql("DELETE FROM consents WHERE worker_id = :id").param("id", id).update();

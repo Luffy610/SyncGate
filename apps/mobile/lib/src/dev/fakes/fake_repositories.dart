@@ -322,3 +322,26 @@ class FakeAuditLog implements AuditLog {
 
   List<AuditEntry> get entries => _entries.value;
 }
+
+class FakeTallyMappingRepository implements TallyMappingRepository {
+  new(DemoSeed seed)
+    : _map = Reactive({
+        for (final w in seed.workers)
+          // One enrolled worker is left unmapped, like the design.
+          if (w.faceStatus == FaceStatus.enrolled && w.id != 'w-0110')
+            w.id: w.name.toUpperCase(),
+      });
+
+  final Reactive<Map<String, String>> _map;
+
+  @override
+  Stream<Map<String, String>> watch() => _map.watch();
+
+  @override
+  Future<Map<String, String>> all() async => _map.value;
+
+  @override
+  Future<void> set(String workerId, String tallyName) async {
+    _map.value = {..._map.value, workerId: tallyName};
+  }
+}

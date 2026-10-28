@@ -92,6 +92,7 @@ public class ReportController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
                         .filename(file.fileName(), StandardCharsets.UTF_8).build().toString())
                 .header("X-Row-Count", Integer.toString(file.rows()))
+                .header("X-Unmapped", Integer.toString(file.unmapped()))
                 .header("X-Content-Sha256", file.sha256())
                 .contentType(MediaType.parseMediaType(file.contentType()))
                 .body(file.bytes());

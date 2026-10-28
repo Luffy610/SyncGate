@@ -42,6 +42,7 @@ abstract final class Routes {
   static const settingsPassphrase = '/admin/settings/backup/passphrase';
   static const settingsShifts = '/admin/settings/shifts';
   static const settingsUsers = '/admin/settings/users';
+  static const settingsTally = '/admin/settings/tally';
   static const settingsLanguage = '/admin/settings/language';
   static const settingsGate = '/admin/settings/gate';
   static const settingsPrivacy = '/admin/settings/privacy';

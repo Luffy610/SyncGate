@@ -81,6 +81,7 @@ class DevEnvironment {
         auditLogProvider.overrideWithValue(remote.audit),
         reportServiceProvider.overrideWithValue(remote.reports),
         exportServiceProvider.overrideWithValue(remote.export),
+        tallyMappingProvider.overrideWithValue(remote.tally),
         backupServiceProvider.overrideWithValue(remote.backup),
         licenceServiceProvider.overrideWithValue(remote.licence),
       ];
@@ -96,6 +97,7 @@ class DevEnvironment {
       auditLogProvider.overrideWithValue(backend.audit),
       reportServiceProvider.overrideWithValue(backend.reports),
       exportServiceProvider.overrideWithValue(backend.export),
+      tallyMappingProvider.overrideWithValue(backend.tally),
       backupServiceProvider.overrideWithValue(backend.backup),
       licenceServiceProvider.overrideWithValue(backend.licence),
     ];

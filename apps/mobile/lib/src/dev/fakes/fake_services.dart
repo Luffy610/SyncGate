@@ -368,9 +368,11 @@ class FakeReportService implements ReportService {
 }
 
 class FakeExportService implements ExportService {
-  new(this.reports);
+  new(this.reports, this.workers, this.tally);
 
   final ReportService reports;
+  final WorkerRepository workers;
+  final TallyMappingRepository tally;
   final exports = <(ExportFormat, ReportFilter)>[];
 
   @override
@@ -381,12 +383,26 @@ class FakeExportService implements ExportService {
     await Future<void>.delayed(const Duration(milliseconds: 400));
     final rows = await reports.monthly(filter);
     exports.add((format, filter));
-    final ext = format == ExportFormat.excel ? 'xlsx' : 'csv';
+    final ext = switch (format) {
+      ExportFormat.excel => 'xlsx',
+      ExportFormat.csv => 'csv',
+      ExportFormat.tally => 'xml',
+    };
     final month =
         '${filter.month.year}-${filter.month.month.toString().padLeft(2, '0')}';
     return Result.ok(
       ExportResult(path: 'syncgate-muster-$month.$ext', rows: rows.length),
     );
+  }
+
+  @override
+  Future<({int matched, int total})> tallyMatch() async {
+    final enrolled = (await workers.all())
+        .where((w) => w.active && w.faceStatus == FaceStatus.enrolled)
+        .toList();
+    final map = await tally.all();
+    final matched = enrolled.where((w) => map.containsKey(w.id)).length;
+    return (matched: matched, total: enrolled.length);
   }
 }
 
@@ -416,7 +432,8 @@ class DemoBackend {
       shifts: shifts,
       now: this.clock.now,
     );
-    export = FakeExportService(reports);
+    tally = FakeTallyMappingRepository(this.seed);
+    export = FakeExportService(reports, workers, tally);
   }
 
   final DemoSeed seed;
@@ -432,5 +449,6 @@ class DemoBackend {
   late final FakeBackupService backup;
   late final FakeLicenceService licence;
   late final FakeReportService reports;
+  late final FakeTallyMappingRepository tally;
   late final FakeExportService export;
 }

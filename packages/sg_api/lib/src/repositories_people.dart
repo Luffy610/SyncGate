@@ -198,3 +198,34 @@ class ApiConsentRepository implements ConsentRepository {
   Future<bool> hasConsent(String workerId) async =>
       (await _api.getMap('api/v1/consents/$workerId'))['hasConsent']! as bool;
 }
+
+/// Which Tally Prime employee each worker is matched to (design 16).
+class ApiTallyMappingRepository implements TallyMappingRepository {
+  new(this._api)
+    : _map = Refreshable<Map<String, String>>(
+        () async => {
+          for (final e in (await _api.getMap('api/v1/tally/mappings')).entries)
+            e.key: e.value! as String,
+        },
+        interval: const Duration(seconds: 15),
+      );
+
+  final ApiClient _api;
+  final Refreshable<Map<String, String>> _map;
+
+  @override
+  Stream<Map<String, String>> watch() => _map.watch();
+
+  @override
+  Future<Map<String, String>> all() => _map.current();
+
+  @override
+  Future<void> set(String workerId, String tallyName) async {
+    await _api.send(
+      'PUT',
+      'api/v1/tally/mappings/$workerId',
+      body: {'name': tallyName},
+    );
+    await _map.refresh();
+  }
+}

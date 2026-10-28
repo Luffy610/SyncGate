@@ -134,6 +134,17 @@ void main() {
     expect(muster.single.worker.code, 'W-0101');
     expect(muster.single.present, 1);
 
+    // Tally: map the worker, then export the import file.
+    await api.tally.set(worker.id, 'RAMESH KUMAR');
+    expect(await api.export.tallyMatch(), (matched: 1, total: 1));
+    final tally = await api.export.export(
+      ExportFormat.tally,
+      ReportFilter(month: DateTime(2026, 10)),
+    );
+    expect((tally as Ok<ExportResult, Failure>).value.rows, 1);
+    final xml = saved.entries.singleWhere((e) => e.key.endsWith('.xml'));
+    expect(utf8.decode(xml.value), contains('<EMPLOYEENAME>RAMESH KUMAR<'));
+
     final csv = await api.export.export(
       ExportFormat.csv,
       ReportFilter(month: DateTime(2026, 10)),

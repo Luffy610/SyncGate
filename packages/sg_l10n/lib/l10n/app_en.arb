@@ -961,6 +961,29 @@
   "reports_export_excelSub": "Template: Payroll — default columns",
   "reports_export_csv": "CSV (.csv)",
   "reports_export_csvSub": "Opens in any spreadsheet app",
+  "reports_export_tally": "Tally Prime (XML)",
+  "reports_export_tallySub": "{matched} of {total} matched to Tally employees · {toMap} to map",
+  "@reports_export_tallySub": {
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      },
+      "toMap": {
+        "type": "int"
+      }
+    }
+  },
+  "reports_export_tallyAllMatched": "All {total} matched to Tally employees",
+  "@reports_export_tallyAllMatched": {
+    "placeholders": {
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "reports_export_action": "Export & share",
   "reports_export_confirmTitle": "{count, plural, =1{1 record still needs review} other{{count} records still need review}}",
   "@reports_export_confirmTitle": {
@@ -983,6 +1006,7 @@
     }
   },
   "reports_menu": "More",
+  "reports_menu_tally": "Tally mapping",
   "reports_menu_templates": "Column templates",
   "reports_pickMonth": "Choose a month",
   "reports_daily_title": "Attendance on {date}",
@@ -1013,6 +1037,7 @@
   "settings_shifts": "Shifts & rules",
   "settings_users": "Users & PINs",
   "settings_language": "Language",
+  "settings_tally": "Tally mapping",
   "settings_gate": "Gate settings",
   "settings_privacy": "Privacy & DPDP pack",
   "settings_about": "About SyncGate",
@@ -1125,6 +1150,22 @@
   "users_mismatch": "The PINs don't match.",
   "users_saved": "PIN changed",
   "users_note": "Gate operators can fix gate issues but can't see reports or export data. Share the gate operator PIN with the guard only.",
+  "tally_title": "Tally mapping",
+  "tally_body": "Match each worker to their employee name in Tally Prime so the export imports cleanly.",
+  "tally_matched": "Matched",
+  "tally_toMap": "To map",
+  "tally_enter": "Tally employee name",
+  "tally_summary": "{matched} of {total} matched",
+  "@tally_summary": {
+    "placeholders": {
+      "matched": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "gateSettings_title": "Gate settings",
   "gateSettings_autoReturn": "Return to gate after",
   "gateSettings_autoReturnSub": "When Admin is left untouched",

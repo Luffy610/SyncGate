@@ -21,5 +21,5 @@ public final class Enums {
 
     public enum LicenceState { NONE, TRIAL, ACTIVE, GRACE_OVERDUE, RESTRICTED, REVOKED }
 
-    public enum ExportFormat { EXCEL, CSV }
+    public enum ExportFormat { EXCEL, CSV, TALLY }
 }

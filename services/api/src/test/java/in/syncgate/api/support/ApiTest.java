@@ -81,7 +81,7 @@ public abstract class ApiTest {
     @Autowired private UserService userService;
 
     private static final String[] TABLES = {
-        "exceptions", "attendance_events", "consents", "workers", "shifts", "departments", "users",
+        "exceptions", "attendance_events", "consents", "tally_mappings", "workers", "shifts", "departments", "users",
         "audit_log", "chain_heads", "licence", "issued_licence_keys", "backups", "backup_key", "exports",
         "app_settings"
     };

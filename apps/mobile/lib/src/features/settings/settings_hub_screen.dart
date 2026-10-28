@@ -57,6 +57,7 @@ class SettingsHubScreen extends ConsumerWidget {
             children: [
               row(l10n.settings_shifts, Routes.settingsShifts),
               row(l10n.settings_gate, Routes.settingsGate),
+              row(l10n.settings_tally, Routes.settingsTally),
             ],
           ),
           const SizedBox(height: 16),

@@ -43,18 +43,25 @@ public class ExportService {
     public static final String CSV = "text/csv; charset=utf-8";
     private static final DateTimeFormatter DMY = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
-    public record ExportFile(String fileName, String contentType, byte[] bytes, int rows, String sha256) {}
+    public static final String XML = "application/xml; charset=utf-8";
+
+    /** {@code unmapped} is only used by Tally files: workers left out for lack of a Tally name. */
+    public record ExportFile(String fileName, String contentType, byte[] bytes, int rows, String sha256,
+            int unmapped) {}
 
     private final ReportService reports;
+    private final in.syncgate.api.tally.TallyService tally;
     private final ExceptionService exceptions;
     private final AuditService audit;
     private final ChainService chain;
     private final JdbcClient jdbc;
     private final AppClock clock;
 
-    public ExportService(ReportService reports, ExceptionService exceptions, AuditService audit, ChainService chain,
+    public ExportService(ReportService reports, in.syncgate.api.tally.TallyService tally,
+            ExceptionService exceptions, AuditService audit, ChainService chain,
             JdbcClient jdbc, AppClock clock) {
         this.reports = reports;
+        this.tally = tally;
         this.exceptions = exceptions;
         this.audit = audit;
         this.chain = chain;
@@ -66,16 +73,40 @@ public class ExportService {
     public ExportFile export(ExportFormat format, ReportService.Filter filter, String actor) {
         List<MusterRow> rows = reports.monthly(filter);
         YearMonth month = filter.month();
-        byte[] bytes = format == ExportFormat.CSV ? csv(rows, month) : xlsx(rows, month);
-        String ext = format == ExportFormat.CSV ? "csv" : "xlsx";
-        String name = "SyncGate_Muster_" + month + "." + ext;
+        byte[] bytes;
+        String ext;
+        String type;
+        int count = rows.size();
+        int unmapped = 0;
+        switch (format) {
+            case CSV -> {
+                bytes = csv(rows, month);
+                ext = "csv";
+                type = CSV;
+            }
+            case TALLY -> {
+                var file = tally.build(rows, month);
+                bytes = file.bytes();
+                ext = "xml";
+                type = XML;
+                count = file.employees();
+                unmapped = file.unmapped();
+            }
+            default -> {
+                bytes = xlsx(rows, month);
+                ext = "xlsx";
+                type = XLSX;
+            }
+        }
+        String name = "SyncGate_" + (format == ExportFormat.TALLY ? "Tally" : "Muster") + "_" + month + "." + ext;
         String sha = sha256(bytes);
         jdbc.sql("INSERT INTO exports (id, created_at, format, period, sha256, row_count, created_by) "
                         + "VALUES (:id, :at, :f, :p, :sha, :n, :by)")
                 .param("id", Uuid7.next()).param("at", Db.ts(clock.now())).param("f", Wire.of(format))
-                .param("p", month.toString()).param("sha", sha).param("n", rows.size()).param("by", actor).update();
-        audit.record(actor, "export.created", Wire.of(format) + " " + month + " " + rows.size() + " rows");
-        return new ExportFile(name, format == ExportFormat.CSV ? CSV : XLSX, bytes, rows.size(), sha);
+                .param("p", month.toString()).param("sha", sha).param("n", count).param("by", actor).update();
+        audit.record(actor, "export.created", Wire.of(format) + " " + month + " " + count + " rows"
+                + (unmapped > 0 ? ", " + unmapped + " not mapped" : ""));
+        return new ExportFile(name, type, bytes, count, sha, unmapped);
     }
 
     // ---- CSV ---------------------------------------------------------------

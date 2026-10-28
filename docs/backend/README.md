@@ -12,7 +12,7 @@ repository interfaces it already had, so no screen changed to use it.
 ## Contents
 
 1. [How it fits together](#how-it-fits-together)
-2. [Run it](#run-it)
+2. [Run it](#run-it) and [run everything step by step](#run-everything-step-by-step)
 3. [Frontend ↔ backend map](#frontend--backend-map)
 4. [API reference](#api-reference)
 5. [Security](#security)
@@ -48,6 +48,7 @@ Layers inside the server (`services/api/src/main/java/in/syncgate/api`):
 | `attendance` | Append-only hash-chained events, manual marks, corrections, exceptions |
 | `recognition` | **The seam for face matching** (`FaceRecognitionPort`, mock today) |
 | `report` | Daily view, monthly muster, Excel and CSV export |
+| `tally` | Worker-to-Tally-employee mapping and the Tally Prime import file (XML) |
 | `backup` | `.sgbackup` format, passphrase, restore with verification |
 | `licence` | Trial, activation, dates-driven state, Ed25519 token |
 | `audit` | Hash-chained audit log |
@@ -99,6 +100,57 @@ The Postgres-only migration `V2__append_only_triggers.sql` makes the database it
 on events, audit and consents. *It has not been run against a real PostgreSQL in this repo's tests (no Docker
 available); run the Flyway migration once on a staging Postgres before relying on it.*
 
+## Run everything, step by step
+
+One-time set-up (about 20 minutes, mostly downloads):
+
+1. **Java 17.** Check with `java -version` (it must say 17 or higher). Install from <https://adoptium.net> if not.
+2. **Flutter 3.47.8, Android Studio, an Android emulator** (or a phone with USB debugging): follow the README
+   section *Step-by-step setup* for your OS. `flutter doctor -v` must show green for Flutter and Android.
+3. **Get the code and its dependencies** (repository root):
+   ```bash
+   git clone https://github.com/Luffy610/SyncGate.git && cd SyncGate
+   git checkout feature/tally-export          # the branch with everything in this guide
+   dart pub global activate melos
+   melos bootstrap
+   melos run gen
+   ```
+
+Every time you want to run it, use **two terminals**:
+
+4. **Terminal 1, the back end:**
+   ```bash
+   cd services/api
+   ./mvnw spring-boot:run
+   ```
+   The first run downloads Maven and the libraries (a few minutes). Wait for
+   `Started SyncgateApiApplication`, then check `curl http://localhost:8080/actuator/health` shows `UP`.
+   Leave this terminal open. On Windows use PowerShell and `.\mvnw.cmd spring-boot:run`.
+5. **Start an emulator** (Android Studio, Device Manager, press play) and confirm `flutter devices` lists it.
+6. **Terminal 2, the app:**
+   ```bash
+   cd apps/mobile
+   flutter run --flavor dev -t lib/main_dev_api.dart --dart-define-from-file=env/dev.json
+   ```
+   - Emulator: nothing else to set, `env/dev.json` points at `http://10.0.2.2:8080` (the emulator's name for your computer).
+   - Real phone on the same Wi-Fi: add `--dart-define=API_BASE_URL=http://<your-computer-ip>:8080`.
+7. **Use it.** First launch is the setup wizard (choose a language, press *Scan QR on invoice* then *Activate*, set a
+   shift, pass the camera check, choose an owner PIN and write down the recovery code, enrol the first worker).
+   Then: long-press the SyncGate logo on the gate screen and tap a worker to make the scripted camera "walk up";
+   unlock Admin with your PIN; look at Today, Exceptions and Reports; in Reports choose Excel, CSV or Tally and
+   *Export & share* (the file is saved to the phone's temporary folder; the share sheet is still a stand-in).
+   Settings → Tally mapping lets you give each worker their Tally name.
+8. **Check it is really stored.** Stop the app and start it again: the workers and marks are still there, because they
+   live in the server's database (`services/api/data/`). To start from nothing, stop the server and delete that folder.
+
+Run the tests: `cd services/api && ./mvnw test`, `melos run test`, and for the Dart client against the live server
+`cd packages/sg_api && SG_API_URL=http://localhost:8080 dart test test/live_api_test.dart` (fresh database).
+
+Troubleshooting: *connection refused / "not connected to its back end"* means the server is not running or the URL is
+wrong; *port 8080 in use* means another program (or the web preview) has it, stop that or run the API with
+`--server.port=8081` and pass `--dart-define=API_BASE_URL=http://10.0.2.2:8081`; *"Cannot read link … OneDrive"* from
+`dart test` is a Windows/OneDrive quirk, run `flutter pub get` again or keep the repo outside OneDrive.
+
 ## Frontend ↔ backend map
 
 Every Flutter repository/service interface in `sg_domain` has one API-backed implementation in `sg_api`.
@@ -116,7 +168,8 @@ Every Flutter repository/service interface in `sg_domain` has one API-backed imp
 | `ExceptionRepository` | `ApiExceptionRepository` | `GET /exceptions`, `POST /exceptions`, `POST /exceptions/{id}/resolve` | `attendance/` |
 | `AuditLog` | `ApiAuditLog` | `POST /audit`, `GET /audit` | `audit/` |
 | `ReportService` | `ApiReportService` | `GET /reports/monthly`, `/reports/daily` | `report/` |
-| `ExportService` | `ApiExportService` | `POST /exports` (returns the file) | `report/` |
+| `ExportService` | `ApiExportService` | `POST /exports` (returns the file: `excel`, `csv` or `tally`), `GET /tally/match` | `report/`, `tally/` |
+| `TallyMappingRepository` | `ApiTallyMappingRepository` | `GET /tally/mappings`, `PUT /tally/mappings/{workerId}` | `tally/` |
 | `BackupService` | `ApiBackupService` | `PUT /backups/passphrase`, `POST /backups`, `GET /backups/info`, `POST /backups/restore` | `backup/` |
 | `LicenceService` | `ApiLicenceService` | `GET /licence`, `POST /licence/activate`, `/trial`, `/checkin` | `licence/` |
 | `ClockService` | `ApiClock` (app) | `GET /time` | `common/TimeController` |
@@ -136,7 +189,7 @@ How the app behaves differently with a real server (and why):
   "setup" role. Creating the owner closes that window for good.
 * **Readable ids.** The app makes ids like `ev-123-0` and `shift-day`; `uuidFor()` maps them to a stable UUID,
   so a retried request is idempotent (the server answers with the existing record instead of duplicating).
-* **Tally is gone.** Export is Excel and CSV (ADR-0023).
+* **Three export formats.** Excel, CSV and Tally Prime XML (ADR-0023). Workers without a Tally name are left out of the Tally file and counted in the `X-Unmapped` header; the Tally XML still needs import QA on a real Tally Prime company.
 * **Lists refresh by polling** (3 to 20 s while a screen listens, and immediately after your own change).
   A push channel is Phase 2.
 
@@ -210,7 +263,7 @@ production migration.
   implementation still to write). A nightly job runs at 22:30 when auto-backup is on.
 * **Restore** (`POST /backups/restore`, multipart `file` + `passphrase`) works only on an empty install, so run it
   *before* setup. Every worker comes back as "needs a face" because face data is never in a backup.
-* Export: `POST /exports` with `{"format":"excel"|"csv","month":"2026-10", …filters}` returns the file; each
+* Export: `POST /exports` with `{"format":"excel"|"csv"|"tally","month":"2026-10", …filters}` returns the file; each
   export is logged with its SHA-256.
 
 ## Where the face code goes
@@ -264,7 +317,8 @@ every commit. Merge them in this order (each PR is small to review):
 | 5 | `feature/backend-reports-export` | muster, daily view, Excel and CSV |
 | 6 | `feature/backend-backup-restore` | `.sgbackup`, passphrase, restore |
 | 7 | `feature/backend-licence` | licence state and token |
-| 8 | `feature/export-csv-frontend` | remove Tally from the app, add CSV (ADR-0023) |
+| 8 | `feature/export-csv-frontend` | superseded: its Tally removal was reverted in the next branch |
+| 10 | `feature/tally-export` | Tally restored, CSV kept as a third option, Tally mapping and XML export on the server |
 | 9 | `feature/flutter-api-client` | `sg_api`, wiring, `main_dev_api.dart`, docs |
 
 Nothing has been pushed. Commit messages follow `feat(scope): …`.

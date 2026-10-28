@@ -317,6 +317,81 @@ class _PinSheetState extends ConsumerState<_PinSheet> {
   }
 }
 
+final StreamProvider<Map<String, String>> tallyMapProvider =
+    StreamProvider.autoDispose<Map<String, String>>((ref) {
+      return ref.watch(tallyMappingProvider).watch();
+    });
+
+/// Tally mapping: match each enrolled worker to their Tally employee.
+class TallyScreen extends ConsumerWidget {
+  const new({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
+    final workers =
+        (ref.watch(workersProvider).value ?? const <Worker>[])
+            .where((w) => w.active && w.faceStatus == FaceStatus.enrolled)
+            .toList()
+          ..sort((a, b) => a.name.compareTo(b.name));
+    final map = ref.watch(tallyMapProvider).value ?? const {};
+    final matched = workers.where((w) => map.containsKey(w.id)).length;
+
+    return SettingsPage(
+      title: l10n.tally_title,
+      children: [
+        Text(
+          l10n.tally_body,
+          style: SgText.body.copyWith(color: SgColors.muted, fontSize: 17),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.tally_summary(matched, workers.length),
+          style: SgText.bodyStrong,
+        ),
+        const SizedBox(height: 12),
+        SgCardList(
+          children: [
+            for (final w in workers)
+              SgListRow(
+                title: w.name,
+                subtitle: map[w.id] ?? w.code,
+                trailing: Text(
+                  map.containsKey(w.id) ? l10n.tally_matched : l10n.tally_toMap,
+                  style: SgText.bodyStrong.copyWith(
+                    color: map.containsKey(w.id)
+                        ? SgColors.successText
+                        : SgColors.warningText,
+                  ),
+                ),
+                onTap: () => unawaited(_map(context, ref, w, map[w.id])),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Future<void> _map(
+    BuildContext context,
+    WidgetRef ref,
+    Worker worker,
+    String? current,
+  ) async {
+    final l10n = AppLocalizations.of(context);
+    final name = await showSgTextPrompt(
+      context,
+      title: worker.name,
+      label: l10n.tally_enter,
+      confirmLabel: l10n.common_save,
+      cancelLabel: l10n.common_cancel,
+    );
+    if (name == null) return;
+    await ref.read(tallyMappingProvider).set(worker.id, name);
+    await _audit(ref, 'tally.mapped', worker.code);
+  }
+}
+
 /// Language: the gate / default admin language.
 class LanguageSettingsScreen extends ConsumerWidget {
   const new({super.key});

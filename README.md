@@ -43,7 +43,7 @@ Privacy-first · DPDP-ready · Works with no internet · Android and iOS from on
 
 Small factories that employ contract and daily-wage workers still mark attendance on paper or with shared fingerprint machines. Both are slow, easy to cheat and hard to audit.
 
-SyncGate turns **one phone at the factory gate** into an attendance terminal. A worker looks at the phone, the app recognises the face in under a second and says their name aloud in their own language. The same phone doubles as the owner's **admin console**: enrol workers, fix mistakes, and export a muster roll for payroll (Excel or CSV).
+SyncGate turns **one phone at the factory gate** into an attendance terminal. A worker looks at the phone, the app recognises the face in under a second and says their name aloud in their own language. The same phone doubles as the owner's **admin console**: enrol workers, fix mistakes, and export a muster roll for payroll (Excel, CSV or Tally).
 
 - **Offline by design.** No internet is needed to mark attendance.
 - **Face templates never leave the phone.** They are stored encrypted on the device.
@@ -62,7 +62,7 @@ Phase 1 covers **one device and up to 25 workers per factory**. Multi-gate sync 
 | **Today** | Who is in, out, late or absent, live at the gate's pace, plus a count of records that need review. |
 | **Workers and enrolment** | Add workers, record consent, guided face capture, duplicate-face detection, deactivate or re-enrol. |
 | **Exceptions** | Review missing OUT marks and odd records; correct them with a reason, all of it audited. |
-| **Reports** | Monthly muster grid, Excel and CSV export for payroll. |
+| **Reports** | Monthly muster grid, Excel, CSV and Tally export for payroll, Tally mapping. |
 | **Settings** | Shifts, users, backup (with passphrase), language, gate behaviour, privacy, licence and about. |
 | **Look and feel** | Native-feeling **iOS** and **Android** versions of every screen, from one set of components. |
 
@@ -75,7 +75,7 @@ The Flutter front end for every Phase 1 screen is built and tested (steps F0–F
 | Stage | State |
 |---|---|
 | F0–F5: monorepo, design system, gate, setup, admin screens, reports, settings | ✅ Done, on demo data |
-| **Back end**: Spring Boot API, Dart client, app wired to it (`main_dev_api.dart`), 51 server + 25 client tests | ✅ Done, see [docs/backend](docs/backend/README.md) |
+| **Back end**: Spring Boot API, Dart client, app wired to it (`main_dev_api.dart`), 56 server + 27 client tests | ✅ Done, see [docs/backend](docs/backend/README.md) |
 | F6 (rest): native camera and face model (`sg_vision`), on-device kiosk/voice/share plugins | ⏳ Next (written separately) |
 | F7: restore screen, Google Drive client, more languages, store release | ⏳ Planned |
 | Golden (screenshot) tests, bundled fonts, iOS flavour schemes | ⏳ Need font files and a Mac |
