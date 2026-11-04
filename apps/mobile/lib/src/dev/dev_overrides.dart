@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:sg_domain/sg_domain.dart';
 import 'package:sg_platform/sg_platform.dart';
+import 'package:sg_vision/sg_vision.dart';
 import 'package:syncgate/src/app/providers.dart';
+import 'package:syncgate/src/app/vision_wiring.dart';
 import 'package:syncgate/src/dev/debug_panel.dart';
 import 'package:syncgate/src/dev/fakes/fake_services.dart';
 import 'package:syncgate/src/dev/fakes/fake_vision.dart';
@@ -12,14 +14,18 @@ import 'package:syncgate/src/dev/fakes/fake_vision.dart';
 /// Only `main_dev.dart` may import `src/dev/`, so none of this is compiled
 /// into staging or prod (checked by `tools/check_imports.dart`).
 class DevEnvironment {
-  new({bool freshInstall = true, ClockService? clock})
-    : backend = DemoBackend(
-        ownerExists: !freshInstall,
-        clock: clock,
-        settings: freshInstall
-            ? const AppSettings()
-            : const AppSettings(mode: AppModeKind.gate, setupStep: 7),
-      ) {
+  new({
+    bool freshInstall = true,
+    ClockService? clock,
+    this.realVision,
+    this.realEnrolment = const EnrolmentPolicy(),
+  }) : backend = DemoBackend(
+         ownerExists: !freshInstall,
+         clock: clock,
+         settings: freshInstall
+             ? const AppSettings()
+             : const AppSettings(mode: AppModeKind.gate, setupStep: 7),
+       ) {
     gateVision = FakeGateVisionService();
     enrolment = FakeEnrolmentCaptureService();
     cameraCheck = FakeCameraCheckService();
@@ -33,6 +39,14 @@ class DevEnvironment {
   }
 
   final DemoBackend backend;
+
+  /// When set, the gate, enrolment and camera check run the real face
+  /// pipeline (`--dart-define=VISION=real`) instead of the scripted camera.
+  /// Demo workers have no face templates: enrol someone first.
+  final VisionStack? realVision;
+
+  /// Capture rules when [realVision] is set.
+  final EnrolmentPolicy realEnrolment;
   late final FakeGateVisionService gateVision;
   late final FakeEnrolmentCaptureService enrolment;
   late final FakeCameraCheckService cameraCheck;
@@ -61,9 +75,13 @@ class DevEnvironment {
     tallyMappingProvider.overrideWithValue(backend.tally),
     backupServiceProvider.overrideWithValue(backend.backup),
     licenceServiceProvider.overrideWithValue(backend.licence),
-    gateVisionProvider.overrideWithValue(gateVision),
-    enrolmentCaptureProvider.overrideWithValue(enrolment),
-    cameraCheckProvider.overrideWithValue(cameraCheck),
+    if (realVision case final stack?)
+      ...realVisionOverrides(stack, enrolment: realEnrolment)
+    else ...[
+      gateVisionProvider.overrideWithValue(gateVision),
+      enrolmentCaptureProvider.overrideWithValue(enrolment),
+      cameraCheckProvider.overrideWithValue(cameraCheck),
+    ],
     kioskProvider.overrideWithValue(kiosk),
     voiceProvider.overrideWithValue(voice),
     deviceCheckProvider.overrideWithValue(device),
@@ -75,6 +93,13 @@ class DevEnvironment {
 }
 
 /// Provider overrides for `main_dev.dart`. Set `--dart-define=DEV_START=gate`
-/// to skip the setup wizard (owner PIN 123456).
-List<Override> devOverrides({bool freshInstall = true}) =>
-    DevEnvironment(freshInstall: freshInstall).overrides();
+/// to skip the setup wizard (owner PIN 123456), and
+/// `--dart-define=VISION=real` to use the phone's camera and the real face
+/// models on the demo data.
+List<Override> devOverrides({
+  bool freshInstall = true,
+  bool realVision = false,
+}) => DevEnvironment(
+  freshInstall: freshInstall,
+  realVision: realVision ? deviceVisionStack() : null,
+).overrides();

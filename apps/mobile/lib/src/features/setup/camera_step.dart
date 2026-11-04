@@ -107,7 +107,7 @@ class _CameraStepState extends ConsumerState<CameraStep> {
                   fit: StackFit.expand,
                   children: [
                     if (texture != null && texture >= 0)
-                      Texture(textureId: texture)
+                      VisionPreview(textureId: texture)
                     else
                       const SgFaceSilhouette(),
                     const SgDashedOval(),

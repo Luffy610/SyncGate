@@ -26,3 +26,8 @@ packages/sg_l10n/lib/src/generated/
 
 # Golden test failures
 **/test/**/failures/
+
+# ML data, upstream model downloads and generated face fixtures (ADR-0020:
+# face data is never committed). See ml/README.md.
+.cache/
+__pycache__/

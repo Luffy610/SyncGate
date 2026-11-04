@@ -89,3 +89,18 @@ Each model ships with a **model card** in `ml/models/`: version, SHA-256, traini
 
 - ML owns a training and evaluation pipeline ([ADR-0020](0020-testing-strategy-and-ml-evaluation.md)) and the model cards.
 - GA is **blocked** until TBD-L2 is resolved for the embedding and liveness models.
+
+## Amendment 1 (04-11-2026): first implementation
+
+The pipeline is implemented in `packages/sg_vision` and evaluated in `ml/` ([report](../../ml/reports/sface-int8-lfw.md)). Where it differs from the decision above:
+
+| Topic | Decision above | As built | Why |
+|---|---|---|---|
+| Where inference runs | Native Kotlin/Swift pipeline; no frame reaches Dart | **One Dart pipeline** on a background isolate, LiteRT through [`flutter_litert`](https://pub.dev/packages/flutter_litert) (Apache-2.0, classic Interpreter API, XNNPACK, 4 threads) | One implementation on both OSes gives strict Android/iOS parity, and the CI host runs the *same* `.tflite` files and code as the phones. Frames are copied into isolate memory, never written, logged or sent, and zeroed after analysis, so §3's privacy guarantee holds. A native path stays open if profiling on the reference phone needs it. |
+| Detector | BlazeFace short-range | As decided (Apache-2.0, float16, 0.2 MB) plus a **second pass on a crop around the face** for sharper keypoints | Keypoints at 128 px on a full frame are too coarse for alignment. |
+| Alignment | 5-point similarity transform | **4-point** (eyes, nose tip, mouth centre) onto a template **calibrated for BlazeFace** on LFW folds 6–10 | BlazeFace has no mouth corners, and its points sit slightly off the ArcFace ones. |
+| Embedding | MobileFaceNet class, INT8, licence open (TBD-L2) | **SFace 2021dec** (MobileFaceNet trained with the SFace loss, OpenCV Zoo), INT8 dynamic-range, 9.9 MB, 128-d, plus flip test-time augmentation | The weights are published under Apache-2.0 by their authors. **TBD-L2 stays open for the training-data provenance**, which Legal must still clear before GA. |
+| Liveness | MiniFASNet-class PAD (ADR-0007) | **Not shipped yet.** The gate engine has the hook (`LivenessEstimator`, silent reject) | Needs weights with a clean licence and the in-house PAD set to calibrate. GA stays blocked on ADR-0007. |
+| Model integrity | Model card with SHA-256 | SHA-256s in `assets/models/manifest.json`; the app refuses a model that does not match | |
+
+Thresholds per preset (`T_match`, margin, `T_dup`, `T_adapt`) are produced by `ml/eval/evaluate.py` and shipped in the manifest, as ADR-0009 asks.

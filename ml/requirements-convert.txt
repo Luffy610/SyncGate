@@ -1,0 +1,11 @@
+# Model conversion only (ml/scripts/convert_sface.py). Heavy; not needed for
+# evaluation or tests.
+-r requirements.txt
+onnx
+onnx2tf==2.6.9
+onnx_graphsurgeon
+sng4onnx
+onnxsim
+psutil
+tensorflow==2.21.0
+tf_keras

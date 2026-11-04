@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:sg_domain/sg_domain.dart';
 import 'package:sg_l10n/sg_l10n.dart';
 import 'package:sg_ui/sg_ui.dart';
+import 'package:sg_vision/sg_vision.dart';
 import 'package:syncgate/src/features/gate/gate_controller.dart';
 import 'package:syncgate/src/features/gate/gate_copy.dart';
 
@@ -29,7 +30,7 @@ class ScanningPanel extends StatelessWidget {
                 fit: StackFit.expand,
                 children: [
                   if (texture != null && texture >= 0)
-                    Texture(textureId: texture)
+                    VisionPreview(textureId: texture)
                   else
                     const SgFaceSilhouette(),
                   const SgScanFrame(),

@@ -1,0 +1,60 @@
+{
+  "schema": 1,
+  "detector": {
+    "file": "blaze_face_short_range.tflite",
+    "sha256": "b4578f35940bf5a1a655214a1cce5cab13eba73c1297cd78e1a04c2380b0152f",
+    "input": 128,
+    "score_min": 0.5,
+    "nms_iou": 0.3,
+    "refine_crop_scale": 2.0
+  },
+  "embedder": {
+    "file": "sface_int8_dr.tflite",
+    "sha256": "0674d82dde9de9476c6e2d9a80f9dfb67ab2ae3a1192fa22a2ba5bcc4a41864a",
+    "model_id": "sface-mbf",
+    "model_version": "2021dec-int8dr",
+    "dims": 128
+  },
+  "template": [
+    [
+      37.8791,
+      53.67
+    ],
+    [
+      74.5691,
+      53.8608
+    ],
+    [
+      56.0659,
+      74.169
+    ],
+    [
+      55.9813,
+      91.9492
+    ]
+  ],
+  "thresholds": {
+    "presets": {
+      "strict": 0.5187,
+      "standard": 0.4838,
+      "relaxed": 0.454
+    },
+    "margin": 0.08,
+    "duplicate": 0.5338,
+    "adapt": 0.6338
+  },
+  "evaluation": {
+    "dataset": "LFW view 2 (6,000 pairs; 7,701 images; 4,281 identities)",
+    "lfw_10fold_accuracy_pipeline": 0.9923333333333334,
+    "gate_sim_standard": {
+      "genuine": 10000,
+      "correct": 9413,
+      "misid": 0,
+      "rejected": 587,
+      "impostor": 10000,
+      "false_accept": 1,
+      "rank1_frames": 29870,
+      "rank1_total": 30000
+    }
+  }
+}

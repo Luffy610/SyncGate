@@ -195,7 +195,7 @@ class _EnrolFaceScreenState extends ConsumerState<EnrolFaceScreen> {
                       fit: StackFit.expand,
                       children: [
                         if (texture != null && texture >= 0)
-                          Texture(textureId: texture)
+                          VisionPreview(textureId: texture)
                         else
                           const SgFaceSilhouette(),
                         SgCaptureRing(progress: state.progress),
