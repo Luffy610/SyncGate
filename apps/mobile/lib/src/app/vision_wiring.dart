@@ -31,10 +31,13 @@ List<Override> realVisionOverrides(
 
 /// The production stack: front camera, models on a background isolate,
 /// models loaded from the app bundle. [vault] is in-memory until the
-/// encrypted native vault lands (ADR-0010, epic E10).
-VisionStack deviceVisionStack({TemplateVault? vault}) => VisionStack(
-  source: CameraFrameSource(),
-  runner: IsolateVisionRunner(),
-  vault: vault ?? InMemoryTemplateVault(),
-  loadAssets: ModelAssets.fromBundle,
-);
+/// encrypted native vault lands (ADR-0010, epic E10). [cameraRotation]
+/// (degrees clockwise) overrides the sensor orientation the phone reports,
+/// for devices whose frames come out sideways.
+VisionStack deviceVisionStack({TemplateVault? vault, int? cameraRotation}) =>
+    VisionStack(
+      source: CameraFrameSource(rotationOverride: cameraRotation),
+      runner: IsolateVisionRunner(),
+      vault: vault ?? InMemoryTemplateVault(),
+      loadAssets: ModelAssets.fromBundle,
+    );

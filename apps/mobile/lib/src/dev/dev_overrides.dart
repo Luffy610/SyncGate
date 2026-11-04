@@ -95,11 +95,15 @@ class DevEnvironment {
 /// Provider overrides for `main_dev.dart`. Set `--dart-define=DEV_START=gate`
 /// to skip the setup wizard (owner PIN 123456), and
 /// `--dart-define=VISION=real` to use the phone's camera and the real face
-/// models on the demo data.
+/// models on the demo data (`CAMERA_ROTATION=90|270|…` forces the frame
+/// rotation).
 List<Override> devOverrides({
   bool freshInstall = true,
   bool realVision = false,
+  int? cameraRotation,
 }) => DevEnvironment(
   freshInstall: freshInstall,
-  realVision: realVision ? deviceVisionStack() : null,
+  realVision: realVision
+      ? deviceVisionStack(cameraRotation: cameraRotation)
+      : null,
 ).overrides();

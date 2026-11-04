@@ -27,6 +27,7 @@ Privacy-first · DPDP-ready · Works with no internet · Android and iOS from on
   - [macOS](#macos)
   - [Linux](#linux)
 - [Get the code and run it](#get-the-code-and-run-it)
+- [Run on your phone (USB)](#run-on-your-phone-usb)
 - [Try the demo](#try-the-demo)
 - [Run the tests](#run-the-tests)
 - [Troubleshooting](#troubleshooting)
@@ -114,6 +115,8 @@ flutter run --flavor dev -t lib/main_dev.dart --dart-define-from-file=env/dev.js
 ```
 
 You need Flutter **3.47.8** (pinned in [`.fvmrc`](.fvmrc)) and either an Android emulator/phone, or the [browser preview](#option-c--in-a-browser-no-emulator-needed).
+
+To try **face recognition on a real phone** over USB, use the one-command scripts instead: [Run on your phone (USB)](#run-on-your-phone-usb).
 
 ---
 
@@ -453,7 +456,7 @@ flutter run --flavor dev -t lib/main_dev.dart --dart-define-from-file=env/dev.js
 
 Add `--dart-define=DEV_START=gate` to skip the setup wizard and land on the gate with demo data. With more than one device connected, add `-d <device id>`.
 
-Add `--dart-define=VISION=real` to use the phone's front camera and the real face models instead of the scripted camera (demo data otherwise). The demo workers have no face codes, so enrol someone first (Admin → Workers → Enrol worker), then walk up to the gate. Face codes are kept in memory until the encrypted vault lands, so they are lost when the app restarts.
+Add `--dart-define=VISION=real` to use the phone's front camera and the real face models instead of the scripted camera (demo data otherwise). The [phone scripts](#run-on-your-phone-usb) do all of this for you. The demo workers have no face codes, so enrol someone first (Admin → Workers → Enrol worker), then walk up to the gate. Face codes are kept in memory until the encrypted vault lands, so they are lost when the app restarts.
 
 The first build takes several minutes (Gradle downloads dependencies). Later builds take seconds, and while the app runs you can press **`r`** for hot reload and **`R`** for hot restart.
 
@@ -508,6 +511,33 @@ flutter build apk --debug --flavor dev -t lib/main_dev.dart --dart-define-from-f
 ```
 
 The file is at `build/app/outputs/flutter-apk/app-dev-debug.apk`. Install it with `adb install <path>` or copy it to a phone.
+
+---
+
+## Run on your phone (USB)
+
+Scripts in [`scripts/run-on-device/`](scripts/run-on-device/README.md) build the dev app and run it on a phone plugged in by USB, with the **real camera and face models** (release build, starting at the gate, owner PIN 123456). They check your tools, run `melos bootstrap` and `melos run gen`, find the phone and tell you what to fix if it isn't ready.
+
+| Your computer | Android phone | iPhone |
+|---|---|---|
+| **macOS** | `scripts/run-on-device/macos/android.sh` | `scripts/run-on-device/macos/ios.sh` |
+| **Windows** | `scripts\run-on-device\windows\android.cmd` (or `android.ps1` in PowerShell) | Needs a Mac |
+| **Linux** | `scripts/run-on-device/macos/android.sh` | Needs a Mac |
+
+**Prepare the phone once.** Android: *Settings → About phone →* tap **Build number** 7 times, turn on **USB debugging** in *Developer options*, plug in, and allow USB debugging. iPhone: tap **Trust This Computer**, turn on *Settings → Privacy & Security → Developer Mode* (iOS 16+). The first `ios.sh` run opens Xcode so you can pick a signing team; a free Apple ID works.
+
+```bash
+# macOS, from the repo root
+scripts/run-on-device/macos/android.sh
+scripts/run-on-device/macos/ios.sh
+```
+
+```bat
+:: Windows (Command Prompt, or double-click), from the repo root
+scripts\run-on-device\windows\android.cmd
+```
+
+Useful options: `--device <id>` to pick a phone, `--rotation 90|270` if the camera image is sideways or faces are never found, `--debug` for hot reload (slower recognition), `--setup-wizard`, `--demo-camera`. On Windows the same options are `-Device`, `-Rotation`, `-DebugBuild`, `-SetupWizard` and `-DemoCamera`. All of them, what to try once the app is running, and fixes for common problems are in [the scripts' README](scripts/run-on-device/README.md).
 
 ---
 
@@ -628,7 +658,8 @@ packages/sg_l10n/     Translations (ARB: English, Hindi) and Indian date/time fo
 packages/sg_platform/ Interfaces for kiosk, clock, voice, share, biometric, QR scan
 packages/sg_vision/   Face recognition on the phone: camera, BlazeFace + SFace on LiteRT, matching, enrolment
 ml/                   Model cards, conversion, LFW evaluation and test fixtures (Python)
-tools/                Repo scripts (import-boundary check)
+tools/                Repo scripts (import-boundary check, device picker for the phone scripts)
+scripts/run-on-device/ One-command runs on a USB phone: macos/ (Android, iOS) and windows/ (Android)
 docs/                 PRD, architecture decisions, delivery plans, designs
 .github/workflows/    CI
 ```
