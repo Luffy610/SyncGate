@@ -115,7 +115,7 @@ class ApiExportService implements ExportService {
 }
 
 class ApiBackupService implements BackupService {
-  new(this._api, {this.onPassphraseSet})
+  new(this._api, {this.onPassphraseSet, this.onRestored})
     : _info = Refreshable<BackupInfo>(() async {
         final json = await _api.getMap('api/v1/backups/info');
         return BackupInfo(
@@ -127,6 +127,7 @@ class ApiBackupService implements BackupService {
   final ApiClient _api;
   final Refreshable<BackupInfo> _info;
   final void Function()? onPassphraseSet;
+  final void Function()? onRestored;
 
   @override
   Stream<BackupInfo> watch() => _info.watch();
@@ -172,6 +173,7 @@ class ApiBackupService implements BackupService {
         fileName: 'restore.sgbackup',
         fields: {'passphrase': passphrase},
       );
+      onRestored?.call();
       final records = RegExp(r'"records":(\d+)').firstMatch(response.body);
       return Result.ok(int.tryParse(records?.group(1) ?? '') ?? 0);
     } on ApiError catch (e) {

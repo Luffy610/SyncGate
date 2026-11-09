@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:http/http.dart' as http;
 import 'package:sg_api/src/api_client.dart';
 import 'package:sg_api/src/json.dart';
@@ -37,7 +39,16 @@ class ApiBackend {
     audit = ApiAuditLog(client);
     reports = ApiReportService(client, now);
     export = ApiExportService(client, saveFile);
-    backup = ApiBackupService(client, onPassphraseSet: settings.refresh);
+    backup = ApiBackupService(
+      client,
+      onPassphraseSet: settings.refresh,
+      onRestored: () {
+        // The restore created the owner: the setup window is closed, so the
+        // phone now signs in with its device key like any other request.
+        client.hasOwner = true;
+        unawaited(settings.refresh());
+      },
+    );
     licence = ApiLicenceService(client);
   }
 

@@ -26,7 +26,7 @@ class ApiSettingsRepository implements SettingsRepository {
   @override
   Future<void> save(AppSettings settings) async {
     await _api.send('PUT', 'api/v1/settings', body: settingsToJson(settings));
-    if (settings.mode == AppModeKind.gate) _api.tokens.clearAdmin();
+    if (settings.mode == AppModeKind.gate) await _api.endAdminSession();
     await _settings.refresh();
   }
 }

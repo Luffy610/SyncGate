@@ -115,6 +115,21 @@ class WorkerFlowTest extends ApiTest {
                 .andExpect(jsonPath("$.active").value(false));
     }
 
+
+    @Test
+    void lastWizardStepsKeepSavingProgressAfterTheOwnerExists() throws Exception {
+        String owner = createOwner("123456");
+        String base = getJson("/api/v1/settings", owner).andExpect(jsonPath("$.mode").value("setup"))
+                .andReturn().getResponse().getContentAsString();
+        // Step 7 (first worker) is saved while the mode is still setup: allowed.
+        putJson("/api/v1/settings", owner, base.replace("\"setupStep\":1", "\"setupStep\":7"))
+                .andExpect(status().isNoContent());
+        getJson("/api/v1/settings", owner).andExpect(jsonPath("$.setupStep").value(7));
+        // Finishing setup is one way: the same request is refused once the mode is gate.
+        putJson("/api/v1/settings", owner, base.replace("\"mode\":\"setup\"", "\"mode\":\"gate\""))
+                .andExpect(status().isNoContent());
+        putJson("/api/v1/settings", owner, base).andExpect(status().isConflict());
+    }
     @Test
     void settingsGateDeviceMayOnlyChangeModeAndSetupIsOneWay() throws Exception {
         String owner = createOwner("123456");

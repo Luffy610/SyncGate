@@ -141,7 +141,8 @@ void main() {
             'user': {'id': 'u1', 'name': 'Owner', 'role': 'owner'},
           })
           ..json('GET /api/v1/settings', _settings('admin'))
-          ..json('PUT /api/v1/settings', <String, Object>{}, status: 204);
+          ..json('PUT /api/v1/settings', <String, Object>{}, status: 204)
+          ..json('POST /api/v1/auth/logout', <String, Object>{}, status: 204);
         final api = backend(s);
         final result = await api.users.verifyPin(Role.owner, '123456');
         expect(result.isOk, isTrue);
@@ -152,6 +153,10 @@ void main() {
         );
         await api.settings.save(
           const AppSettings(mode: AppModeKind.gate, setupStep: 7),
+        );
+        expect(
+          s.to('POST /api/v1/auth/logout').single.headers['Authorization'],
+          'Bearer ADMIN',
         );
         await api.client.getMap('api/v1/settings');
         expect(

@@ -79,10 +79,11 @@ public abstract class ApiTest {
 
     @Autowired private JdbcClient jdbc;
     @Autowired private UserService userService;
+    @Autowired private in.syncgate.api.security.RateLimitFilter rateLimit;
 
     private static final String[] TABLES = {
         "exceptions", "attendance_events", "consents", "tally_mappings", "workers", "shifts", "departments", "users",
-        "audit_log", "chain_heads", "licence", "issued_licence_keys", "backups", "backup_key", "exports",
+        "audit_log", "chain_heads", "licence", "issued_licence_keys", "backups", "backup_key", "exports", "revoked_tokens",
         "app_settings"
     };
 
@@ -99,6 +100,8 @@ public abstract class ApiTest {
             jdbc.sql("DELETE FROM " + table).update();
         }
         ReflectionTestUtils.setField(userService, "ownerExists", false);
+        // The sign-in rate limit is per address and all tests share one, so start each test fresh.
+        ((java.util.Map<?, ?>) ReflectionTestUtils.getField(rateLimit, "hits")).clear();
     }
 
     // ---- auth helpers ------------------------------------------------------

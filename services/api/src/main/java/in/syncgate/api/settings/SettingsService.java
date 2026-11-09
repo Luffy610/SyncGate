@@ -52,7 +52,10 @@ public class SettingsService {
     public void save(SettingsController.SettingsDto in, boolean full, String actor) {
         AppMode mode = Wire.parse(AppMode.class, in.mode());
         SettingsController.SettingsDto current = load();
-        if (mode == AppMode.SETUP && users.ownerExists()) {
+        // Going back to setup is refused once setup is finished, but the last wizard steps
+        // (after the owner exists) still save their progress while the mode is already setup.
+        boolean setupInProgress = Wire.of(AppMode.SETUP).equals(current.mode());
+        if (mode == AppMode.SETUP && users.ownerExists() && !setupInProgress) {
             throw ApiException.conflict("SETUP_DONE", "Setup is already finished");
         }
         if (full) {

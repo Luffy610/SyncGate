@@ -6,6 +6,8 @@ import in.syncgate.api.domain.Role;
 import in.syncgate.api.domain.Wire;
 import in.syncgate.api.security.JwtService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -70,6 +72,15 @@ public class AuthController {
         }
         JwtService.Issued issued = jwt.issue(Role.DEVICE, "device", "Gate device");
         return new TokenResponse(issued.token(), issued.expiresAt(), null, null);
+    }
+
+    /** Ends the caller's own token now (Admin returns to the gate), instead of waiting for it to expire. */
+    @PostMapping("/auth/logout")
+    @org.springframework.web.bind.annotation.ResponseStatus(HttpStatus.NO_CONTENT)
+    public void logout(@AuthenticationPrincipal Jwt token) {
+        if (token != null) {
+            jwt.revoke(token.getId(), token.getExpiresAt());
+        }
     }
 
     @PostMapping("/auth/login")

@@ -75,6 +75,23 @@ class AuthFlowTest extends ApiTest {
                 .andExpect(jsonPath("$.details.attemptsLeft").value(4));
     }
 
+
+    @Test
+    void logoutEndsTheTokenImmediatelyButNotOtherTokens() throws Exception {
+        String owner = createOwner("123456");
+        String again = login("owner", "123456");
+        getJson("/api/v1/users", owner).andExpect(status().isOk());
+
+        mvc.perform(post("/api/v1/auth/logout").header("Authorization", "Bearer " + owner))
+                .andExpect(status().isNoContent());
+        // The ended token is dead at once, a second token of the same user still works.
+        getJson("/api/v1/users", owner).andExpect(status().isUnauthorized());
+        getJson("/api/v1/users", again).andExpect(status().isOk());
+        // Logging out again with the dead token, or with no token, is refused.
+        mvc.perform(post("/api/v1/auth/logout").header("Authorization", "Bearer " + owner))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(post("/api/v1/auth/logout")).andExpect(status().isUnauthorized());
+    }
     @Test
     void lockoutPolicyMatchesTheFlutterPinPolicy() {
         assertEquals(Duration.ZERO, UserService.lockoutAfter(4));

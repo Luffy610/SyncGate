@@ -279,5 +279,21 @@ class ApiClient {
     _ => ApiError.offline(),
   };
 
+  /// Ends the admin session on the server, then forgets the token. Best
+  /// effort: if the server cannot be reached the token still expires on its
+  /// own, and the app drops it either way.
+  Future<void> endAdminSession() async {
+    final token = tokens.admin;
+    tokens.clearAdmin();
+    if (token == null) return;
+    try {
+      final request = http.Request('POST', _uri('api/v1/auth/logout', null))
+        ..headers['Authorization'] = 'Bearer $token';
+      await _http.send(request).timeout(timeout);
+    } on Exception {
+      // Ignored on purpose, see above.
+    }
+  }
+
   void close() => _http.close();
 }
