@@ -85,7 +85,7 @@ void main() {
     final base = Directory('${root.path}/$dir');
     if (!base.existsSync()) continue;
 
-    for (final entity in base.listSync(recursive: true)) {
+    for (final entity in _walk(base)) {
       if (entity is! File || !entity.path.endsWith('.dart')) continue;
       final path = entity.path
           .substring(root.path.length + 1)
@@ -117,4 +117,24 @@ void main() {
     ..writeAll(violations.map((v) => '  $v'), '\n')
     ..writeln();
   exitCode = 1;
+}
+
+/// Every file under [dir], without descending into build output or tool
+/// caches (they can be huge, change while a build runs, and are not source).
+Iterable<FileSystemEntity> _walk(Directory dir) sync* {
+  const skipped = {'build', '.dart_tool', '.gradle', 'Pods', 'node_modules'};
+  final List<FileSystemEntity> children;
+  try {
+    children = dir.listSync();
+  } on FileSystemException {
+    return;
+  }
+  for (final child in children) {
+    final name = child.uri.pathSegments.where((s) => s.isNotEmpty).last;
+    if (child is Directory) {
+      if (!skipped.contains(name)) yield* _walk(child);
+    } else {
+      yield child;
+    }
+  }
 }

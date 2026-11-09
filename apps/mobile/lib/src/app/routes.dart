@@ -13,6 +13,9 @@ abstract final class Routes {
   static const setupOwner = '/setup/owner';
   static const setupFirstWorker = '/setup/first-worker';
 
+  /// Restore a backup instead of setting up from scratch (first step only).
+  static const setupRestore = '/setup/restore';
+
   /// Setup steps in order; step n (1-based) is `setupSteps[n - 1]`.
   static const List<String> setupSteps = [
     setupLanguage,
@@ -65,6 +68,7 @@ abstract final class Routes {
 String? redirectFor(AppMode mode, String location) {
   switch (mode) {
     case SetupMode(:final step):
+      if (location == Routes.setupRestore && step == 1) return null;
       final index = Routes.setupSteps.indexOf(location);
       // Only steps up to the current one are reachable.
       if (index < 0 || index > step - 1) return Routes.homeFor(mode);

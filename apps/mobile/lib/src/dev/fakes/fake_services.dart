@@ -160,7 +160,9 @@ class FakeBackupService implements BackupService {
   Future<Result<int, Failure>> restore({
     required List<int> file,
     required String passphrase,
-  }) async => const Result.err(Unexpected('Restore needs the real back end'));
+  }) async => passphrase == 'wrong'
+      ? const Result.err(Unexpected('Wrong passphrase, or the file is damaged'))
+      : Result.ok(file.length);
 }
 
 class FakeLicenceService implements LicenceService {
@@ -451,4 +453,14 @@ class DemoBackend {
   late final FakeReportService reports;
   late final FakeTallyMappingRepository tally;
   late final FakeExportService export;
+}
+
+/// Returns whatever file the test or debug session set up.
+class FakeFilePickService implements FilePickService {
+  new();
+
+  PickedFile? next = const PickedFile(name: 'demo.sgbackup', bytes: [1, 2, 3]);
+
+  @override
+  Future<PickedFile?> pickFile() async => next;
 }

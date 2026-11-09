@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sg_api/sg_api.dart';
 import 'package:syncgate/bootstrap.dart';
@@ -27,5 +28,13 @@ Future<void> main() async {
     // The server is not reachable yet: the app opens and says so, and keeps
     // the phone's own clock until it is restarted.
   }
-  await bootstrap(config, overrides: devApiOverrides(api, clock));
+  await bootstrap(
+    config,
+    overrides: devApiOverrides(
+      api,
+      clock,
+      useAndroidPlatform:
+          !kIsWeb && defaultTargetPlatform == TargetPlatform.android,
+    ),
+  );
 }
