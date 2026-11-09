@@ -12,7 +12,7 @@ repository interfaces it already had, so no screen changed to use it.
 ## Contents
 
 1. [How it fits together](#how-it-fits-together)
-2. [Run it](#run-it) and [run everything step by step](#run-everything-step-by-step)
+2. [Run it](#run-it), [run everything step by step](#run-everything-step-by-step), [Android and testing](#android-run-and-test-the-whole-app), [security](#is-authentication-secure) and [where data lives](#where-is-the-data-stored)
 3. [Frontend ↔ backend map](#frontend--backend-map)
 4. [API reference](#api-reference)
 5. [Security](#security)
@@ -149,8 +149,70 @@ Run the tests: `cd services/api && ./mvnw test`, `melos run test`, and for the D
 Troubleshooting: *connection refused / "not connected to its back end"* means the server is not running or the URL is
 wrong; *port 8080 in use* means another program (or the web preview) has it, stop that or run the API with
 `--server.port=8081` and pass `--dart-define=API_BASE_URL=http://10.0.2.2:8081`; *"Cannot read link … OneDrive"* from
-`dart test` is a Windows/OneDrive quirk, run `flutter pub get` again or keep the repo outside OneDrive.
+`dart test` is a Windows/OneDrive quirk, run `flutter pub get` again or keep the repo outside OneDrive. On Windows `mvnw.cmd` may print "The syntax of the command is incorrect" in a OneDrive-redirected folder; use Git Bash and `./mvnw` instead.
 
+## Android: run and test the whole app
+
+The app runs on an Android emulator or a phone with the real Android services: share sheet, text-to-speech voice,
+keep-awake, fingerprint/face unlock (if the phone has one), screen pinning and the hardware check. The camera, the QR
+scanner and face recognition are still stand-ins (the scripted camera).
+
+1. **Android SDK pieces** (once). In Android Studio, SDK Manager, install *Android SDK Platform 36*, *Build-Tools 36* and
+   *NDK (Side by side) 28.2.13676358*, or from a terminal:
+   `sdkmanager "platforms;android-36" "build-tools;36.0.0" "ndk;28.2.13676358"`.
+2. **Start an emulator** (Device Manager, press play) or plug in a phone with USB debugging. `flutter devices` must list it.
+3. **Start the API**: `cd services/api && ./mvnw spring-boot:run` (use Git Bash or macOS/Linux; see *Troubleshooting* for Windows).
+4. **Run the app**: `cd apps/mobile && flutter run --flavor dev -t lib/main_dev_api.dart --dart-define-from-file=env/dev.json`.
+   The emulator reaches your computer at `10.0.2.2` (already in `env/dev.json`). For a real phone add
+   `--dart-define=API_BASE_URL=http://<your-computer-ip>:8080`.
+5. **Test everything automatically** (fresh database, real UI on the device, real API, real database):
+   `powershell -File tools/test-real-stack.ps1` (Windows) or, by hand, wipe `services/api/data`, start the API, then
+   `cd apps/mobile && flutter test integration_test/real_stack_test.dart -d <device> --flavor dev --dart-define-from-file=env/dev.json`.
+   It walks setup, enrolment, a gate mark, admin unlock, reports, Tally mapping and a backup, then checks both hash chains.
+
+What the test does **not** cover: the real camera, face matching, Google Drive, a physical phone's screen pinning prompt.
+
+### Restore on a new phone
+On a fresh install, step 1 of setup has *Restore from a backup*. Choose the `.sgbackup` file, type the passphrase. Settings,
+workers and history come back; every worker shows "Needs face" until they scan again. It only works on a fresh server
+database (the API refuses otherwise).
+
+## Is authentication secure?
+
+**Reasonably, for Phase 1, with known limits.** What is in place:
+
+* PINs are 6 digits, stored only as **Argon2id** hashes. 5 wrong tries, then a lock of 30 s doubling to 15 min, kept in the
+  **database** (restart does not reset it). Unknown accounts cost the same time.
+* Every API call needs a signed **JWT**. Admin tokens last 30 minutes and are **revoked on the server the moment the app
+  returns to the gate** (`POST /auth/logout`, checked on every request). The gate phone has its own token that can read
+  and mark but cannot see reports, users, backups or the audit log.
+* The server decides what each role may do; the app only hides buttons. Time, direction, cooldown and the manual-entry limit
+  are server-side, so a changed phone clock or a tampered app cannot forge attendance.
+* Rate limit on sign-in endpoints, hardened headers, one error shape with no internals, parameterised SQL, startup refuses
+  weak or development secrets in production.
+
+Known limits (do these before real customers):
+
+* **Traffic is plain HTTP in development.** Production must sit behind HTTPS (TLS) and the app should pin the certificate. Not done.
+* The **device key** that lets a phone obtain its gate token is built into the app. Anyone who extracts it can read workers and
+  record marks as a "gate" until the key is rotated. Per-phone keys with attestation (Play Integrity) are the fix. Not done.
+* A 6-digit PIN is guessable by someone who is physically at the phone for long enough, even with lockout.
+  Biometric unlock and the OS screen lock help; there is no remote wipe yet.
+* The admin token is held in memory only (never written to disk), but the device token is requested again at each start.
+* No penetration test has been done.
+
+## Where is the data stored?
+
+| Data | Where | Protected by |
+|---|---|---|
+| Workers, shifts, settings, attendance, corrections, exceptions, consents, audit log, licence, Tally names, PIN hashes | **The server's database.** Dev: an H2 file at `services/api/data/syncgate.mv.db` on the computer running the API. Production: PostgreSQL. | PIN/JWT/role checks; hash chains detect edits; **not encrypted at rest** in dev (use disk encryption or Postgres encryption in production) |
+| Backups (`.sgbackup`) | `services/api/data/backups/` (stand-in for Google Drive) and the file you share out | AES-256-GCM, key from a passphrase only the owner knows |
+| Exports (xlsx/csv/xml) | Created on request, saved in the phone's temporary folder, then shared; the server keeps only a checksum | Not encrypted: they are payroll data, share with care |
+| Face templates | **Nowhere yet** (matching is not built). By design they will live only in an encrypted vault on the phone and never in the database or backups | Planned (ADR-0010) |
+| On the phone | Only the settings cached for the session and the gate token (memory). Nothing else is stored on the phone in this version | OS app sandbox |
+
+Important consequence: in this version the **server is the single copy of the data**. The original design (ADR-0001/0010) kept it on the phone
+with the phone as the only copy; the Spring Boot API replaces that, so back up the server's database. The gate does not work without the server.
 ## Frontend ↔ backend map
 
 Every Flutter repository/service interface in `sg_domain` has one API-backed implementation in `sg_api`.
@@ -319,6 +381,7 @@ every commit. Merge them in this order (each PR is small to review):
 | 7 | `feature/backend-licence` | licence state and token |
 | 8 | `feature/export-csv-frontend` | superseded: its Tally removal was reverted in the next branch |
 | 10 | `feature/tally-export` | Tally restored, CSV kept as a third option, Tally mapping and XML export on the server |
+| 11 | `feature/android-platform-services` | real Android services, restore screen, token revocation, setup fixes, on-device full-stack test |
 | 9 | `feature/flutter-api-client` | `sg_api`, wiring, `main_dev_api.dart`, docs |
 
 Nothing has been pushed. Commit messages follow `feat(scope): …`.
@@ -327,9 +390,11 @@ Nothing has been pushed. Commit messages follow `feat(scope): …`.
 
 * Face recognition, liveness and the native camera are not part of this work (by design, see above).
 * Google Drive backup is not implemented; backups go to a local folder behind the `BackupStore` interface.
+* Still stand-ins on the phone: the camera, the QR scanner (the licence key is typed or pasted), screen dimming at the gate, and recorded voice clips (the voice is the phone's text-to-speech).
+* Dev profile only: the server's demo clock restarts at 24-10-2026 05:52 whenever the API restarts. Production uses the real clock.
+* An API error that the app has no screen for (for example the server is down mid-action) is not shown to the user yet; the action simply does not complete.
 * The licence server is the same Spring app in mock mode; the standalone Go service in ADR-0014 is not built.
 * Night-shift attribution in reports uses the calendar day of the IN (the full shift engine is a later step).
-* Restore has an API but no Flutter screen yet.
 * iOS: the Dart side works on both platforms; the iOS native code and Xcode flavour schemes still need a Mac.
 * Staging and prod entry points are still unwired (they will bind `ApiBackend` the same way once the native
   vision code exists).

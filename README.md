@@ -76,7 +76,8 @@ The Flutter front end for every Phase 1 screen is built and tested (steps F0–F
 |---|---|
 | F0–F5: monorepo, design system, gate, setup, admin screens, reports, settings | ✅ Done, on demo data |
 | **Back end**: Spring Boot API, Dart client, app wired to it (`main_dev_api.dart`), 56 server + 27 client tests | ✅ Done, see [docs/backend](docs/backend/README.md) |
-| F6 (rest): native camera and face model (`sg_vision`), on-device kiosk/voice/share plugins | ⏳ Next (written separately) |
+| Android services: share sheet, voice, biometrics, screen pinning, hardware check, restore screen, on-device full-stack test | ✅ Done |
+| F6 (rest): native camera and face model (`sg_vision`) | ⏳ Next (written separately) |
 | F7: restore screen, Google Drive client, more languages, store release | ⏳ Planned |
 | Golden (screenshot) tests, bundled fonts, iOS flavour schemes | ⏳ Need font files and a Mac |
 
