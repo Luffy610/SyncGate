@@ -420,8 +420,9 @@ class _BackupCard extends ConsumerWidget {
   }
 }
 
-/// Runs a backup with a progress dialog and a confirmation toast.
-Future<void> runBackup(BuildContext context, WidgetRef ref) async {
+/// Runs a backup with a progress dialog and a confirmation toast. Returns
+/// whether the backup was made.
+Future<bool> runBackup(BuildContext context, WidgetRef ref) async {
   final l10n = AppLocalizations.of(context);
   final session = ref.read(adminSessionProvider);
   final result = await showSgBusy(
@@ -429,7 +430,7 @@ Future<void> runBackup(BuildContext context, WidgetRef ref) async {
     message: l10n.backup_inProgress,
     task: ref.read(backupServiceProvider).backupNow(),
   );
-  if (!context.mounted) return;
+  if (!context.mounted) return result.isOk;
   if (result.isOk) {
     unawaited(
       ref
@@ -446,4 +447,5 @@ Future<void> runBackup(BuildContext context, WidgetRef ref) async {
   } else {
     showSgToast(context, l10n.common_error);
   }
+  return result.isOk;
 }

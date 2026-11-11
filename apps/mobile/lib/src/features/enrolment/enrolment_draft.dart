@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sg_domain/sg_domain.dart';
+import 'package:syncgate/src/app/app_mode.dart';
 import 'package:syncgate/src/app/providers.dart';
 
 /// The notice shown before enrolment is versioned content, not UI strings
@@ -191,7 +192,7 @@ class EnrolmentController extends Notifier<EnrolmentForm> {
           .append(
             AuditEntry(
               at: ref.read(clockProvider).now(),
-              actor: 'admin',
+              actor: ref.read(adminSessionProvider)?.user.name ?? 'admin',
               action: 'worker.created',
               detail: created.code,
             ),
@@ -208,7 +209,9 @@ class EnrolmentController extends Notifier<EnrolmentForm> {
             designation: form.designation.trim(),
             shiftId: form.shiftId,
             contractor: form.contractor,
+            clearContractor: form.contractor == null,
             phone: phone,
+            clearPhone: phone == null,
             language: form.language,
           ),
         );

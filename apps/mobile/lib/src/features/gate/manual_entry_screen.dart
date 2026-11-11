@@ -166,6 +166,11 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
         .where((c) => c.worker.id == state.selectedWorkerId)
         .firstOrNull;
 
+    // The camera keeps running behind this screen, so the picked worker can
+    // be marked by face meanwhile. They then leave the list, and saving
+    // would store the opposite mark.
+    final canSave = state.canSave && selected != null;
+
     final saveLabel = selected == null
         ? l10n.gate_manual_saveEmpty
         : l10n.gate_manual_save(
@@ -327,7 +332,7 @@ class _ManualEntryScreenState extends ConsumerState<ManualEntryScreen> {
                     label: saveLabel,
                     kind: SgButtonKind.brand,
                     large: true,
-                    onPressed: state.canSave
+                    onPressed: canSave
                         ? () async {
                             final marked = await controller.save();
                             if (marked != null && context.mounted) {

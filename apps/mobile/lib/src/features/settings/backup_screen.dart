@@ -153,7 +153,8 @@ class BackupScreen extends ConsumerWidget {
     }
     final hold = ref.read(idleHoldProvider.notifier)..hold();
     try {
-      await runBackup(context, ref);
+      // Nothing to share if the backup could not be made.
+      if (!await runBackup(context, ref)) return;
       await ref.read(shareProvider).shareFile('syncgate-backup.sgbackup');
     } finally {
       hold.release();
@@ -277,7 +278,7 @@ class PassphraseScreen extends ConsumerStatefulWidget {
 }
 
 class _PassphraseScreenState extends ConsumerState<PassphraseScreen> {
-  final _random = Random();
+  final _random = Random.secure();
   final _confirm = TextEditingController();
   late String _suggestion = suggestPassphrase(_random);
   var _acknowledged = false;

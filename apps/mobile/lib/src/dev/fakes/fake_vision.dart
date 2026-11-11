@@ -14,12 +14,16 @@ class FakeGateVisionService implements GateVisionService {
 
   /// Simulates a camera that cannot start (permission denied, in use).
   bool failOnStart = false;
+
+  /// How long the camera takes to start, as a real one does.
+  Duration startDelay = Duration.zero;
   GateVisionConfig? lastConfig;
   Timer? _demo;
 
   @override
   Future<int> start(GateVisionConfig config) async {
     if (failOnStart) throw StateError('camera unavailable');
+    if (startDelay > Duration.zero) await Future<void>.delayed(startDelay);
     running = true;
     lastConfig = config;
     return fakeTextureId;

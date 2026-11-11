@@ -36,11 +36,10 @@ class _EnrolDetailsScreenState extends ConsumerState<EnrolDetailsScreen> {
   }
 
   Future<void> _init() async {
-    final controller = ref.read(enrolmentProvider.notifier);
-    // Coming back from the notice step keeps what was typed.
-    if (ref.read(enrolmentProvider).workerId == null) {
-      await controller.startNew();
-    }
+    // This screen is only ever opened to add a new worker, so drop whatever
+    // the last enrolment left behind. Coming back from the notice step pops
+    // to this same state object and does not run this again.
+    await ref.read(enrolmentProvider.notifier).startNew();
     if (!mounted) return;
     final form = ref.read(enrolmentProvider);
     setState(() {

@@ -98,7 +98,12 @@ class GateController extends Notifier<GateViewState> {
       final texture = await _vision.start(
         GateVisionConfig(useScreenFillLight: settings.screenFillLight),
       );
-      if (_disposed) return;
+      if (_disposed) {
+        // The gate was left while the camera was still starting, so the
+        // stop in [_shutdown] ran too early to have any effect.
+        await _vision.stop();
+        return;
+      }
       state = state.copyWith(textureId: texture);
       await _screen.setKeepAwake(enabled: true);
       _armDim();

@@ -263,6 +263,50 @@ void main() {
       expect(audit, contains('attendance.manual'));
     });
 
+    testWidgets('a manual IN after the grace period is stored as late', (
+      tester,
+    ) async {
+      final app = await pumpApp(tester, now: DateTime(2026, 10, 24, 6, 25));
+      final result = await app.container
+          .read(markManualAttendanceProvider)
+          .call(
+            workerId: rameshId,
+            reason: ManualReason.cameraIssue,
+            actor: 'G-02',
+          );
+      expect(result.valueOrNull?.event.direction, Direction.checkIn);
+      expect(result.valueOrNull?.event.onTime, isFalse);
+    });
+
+    testWidgets('a worker marked by face meanwhile can no longer be saved', (
+      tester,
+    ) async {
+      final app = await pumpApp(tester);
+      await openManual(tester, app);
+      await tester.ensureVisible(find.text('Ramesh Kumar'));
+      await tester.tap(find.text('Ramesh Kumar'));
+      await tester.pump();
+      await tester.tap(find.text('Mask / helmet'));
+      await tester.pump();
+
+      // The camera is still running behind the list and recognises him.
+      await app.container.read(markAttendanceProvider).call(rameshId);
+      await tester.pumpAndSettle();
+      expect(find.text('Ramesh Kumar'), findsNothing);
+
+      await tester.tap(find.text('Save'), warnIfMissed: false);
+      await tester.pumpAndSettle();
+
+      expect(app.location, Routes.manual);
+      final events = await app.env.backend.attendance.eventsBetween(
+        DateTime(2026, 10, 24),
+        DateTime(2026, 10, 25),
+      );
+      final his = events.where((e) => e.workerId == rameshId);
+      expect(his.single.direction, Direction.checkIn);
+      expect(his.single.method, MarkMethod.face);
+    });
+
     testWidgets('Cancel returns to the gate without saving', (tester) async {
       final app = await pumpApp(tester);
       await openManual(tester, app);
@@ -349,6 +393,23 @@ void main() {
         findsOneWidget,
       );
     });
+  });
+
+  testWidgets('a camera that finishes starting after the gate was left is '
+      'stopped', (tester) async {
+    final app = await pumpApp(
+      tester,
+      configure: (env) =>
+          env.gateVision.startDelay = const Duration(seconds: 2),
+    );
+    expect(app.env.gateVision.running, isFalse);
+
+    await app.signIn(Role.owner);
+    expect(app.location, Routes.today);
+
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+    expect(app.env.gateVision.running, isFalse);
   });
 
   group('every state fits on both looks at 1.0x and 1.3x text', () {

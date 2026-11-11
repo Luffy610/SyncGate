@@ -10,6 +10,21 @@ var _idCounter = 0;
 String newId(String prefix) =>
     '$prefix-${DateTime.now().microsecondsSinceEpoch}-${_idCounter++}';
 
+/// Whether a mark counts as on time: only an IN can be late, and only
+/// against the worker's own shift.
+Future<bool> _isOnTime(
+  ShiftRepository shifts,
+  Worker worker,
+  Direction direction,
+  DateTime at,
+) async {
+  if (direction != Direction.checkIn) return true;
+  final shift = (await shifts.all())
+      .where((s) => s.id == worker.shiftId)
+      .firstOrNull;
+  return shift == null || AttendanceRules.isOnTime(shift, at);
+}
+
 /// A mark that was stored.
 class Marked {
   const new({required this.worker, required this.event});
@@ -50,13 +65,7 @@ class MarkAttendance {
     }
 
     final direction = AttendanceRules.nextDirection(last, now);
-    final shift = (await shifts.all())
-        .where((s) => s.id == worker.shiftId)
-        .firstOrNull;
-    final onTime =
-        direction != Direction.checkIn ||
-        shift == null ||
-        AttendanceRules.isOnTime(shift, now);
+    final onTime = await _isOnTime(shifts, worker, direction, now);
     final event = AttendanceEvent(
       id: newId('ev'),
       workerId: worker.id,
@@ -76,6 +85,7 @@ class MarkManualAttendance {
   const new({
     required this.workers,
     required this.attendance,
+    required this.shifts,
     required this.exceptions,
     required this.audit,
     required this.clock,
@@ -83,6 +93,7 @@ class MarkManualAttendance {
 
   final WorkerRepository workers;
   final AttendanceRepository attendance;
+  final ShiftRepository shifts;
   final ExceptionRepository exceptions;
   final AuditLog audit;
   final ClockService clock;
@@ -117,6 +128,7 @@ class MarkManualAttendance {
       method: MarkMethod.manual,
       reason: reason.name,
       markedBy: actor,
+      onTime: await _isOnTime(shifts, worker, direction, now),
     );
     await attendance.append(event);
     await exceptions.add(
@@ -156,6 +168,7 @@ final markManualAttendanceProvider = Provider<MarkManualAttendance>((ref) {
   return MarkManualAttendance(
     workers: ref.watch(workerRepositoryProvider),
     attendance: ref.watch(attendanceRepositoryProvider),
+    shifts: ref.watch(shiftRepositoryProvider),
     exceptions: ref.watch(exceptionRepositoryProvider),
     audit: ref.watch(auditLogProvider),
     clock: ref.watch(clockProvider),

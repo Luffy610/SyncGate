@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -303,6 +305,38 @@ void main() {
       await nextStep(tester);
       final workers = await app.env.backend.workers.all();
       expect(workers.where((w) => w.name == 'Geeta Rani'), hasLength(1));
+    });
+  });
+
+  group('one enrolment after another', () {
+    testWidgets('the second starts empty and leaves the first worker alone', (
+      tester,
+    ) async {
+      final app = await openDetails(tester);
+      await toNotice(tester);
+      await agreeAndCapture(tester);
+      await finishCapture(tester);
+      expect(app.location, Routes.workers);
+
+      // The "enrolled" toast covers the button for a moment; open the form
+      // the way the button does.
+      unawaited(app.container.read(routerProvider).push(Routes.enrolDetails));
+      await tester.pumpAndSettle();
+
+      final fields = find.byType(TextField);
+      expect(tester.widget<TextField>(fields.at(0)).controller?.text, isEmpty);
+      expect(tester.widget<TextField>(fields.at(1)).controller?.text, 'W-0127');
+
+      await fillDetails(tester, name: 'Anil Pawar');
+      await nextStep(tester);
+
+      final workers = await app.env.backend.workers.all();
+      final geeta = workers.singleWhere((w) => w.name == 'Geeta Rani');
+      final anil = workers.singleWhere((w) => w.name == 'Anil Pawar');
+      expect(geeta.code, 'W-0126');
+      expect(geeta.faceStatus, FaceStatus.enrolled);
+      expect(anil.code, 'W-0127');
+      expect(anil.faceStatus, FaceStatus.needsFace);
     });
   });
 
