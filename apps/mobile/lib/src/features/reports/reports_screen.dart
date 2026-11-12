@@ -65,12 +65,10 @@ class ReportsScreen extends ConsumerWidget {
       context,
       title: l10n.reports_menu,
       options: [
-        SgOption(value: 'tally', label: l10n.reports_menu_tally),
         SgOption(value: 'templates', label: l10n.reports_menu_templates),
       ],
     );
     if (!context.mounted) return;
-    if (choice == 'tally') context.go(Routes.settingsTally);
     if (choice == 'templates') {
       showSgToast(context, l10n.common_comingSoon);
     }
@@ -508,7 +506,7 @@ class _DailyList extends ConsumerWidget {
   }
 }
 
-/// "EXPORT FOR PAYROLL": pick Excel or Tally and share the file (design 16).
+/// "EXPORT FOR PAYROLL": pick Excel or CSV and share the file (design 16).
 class ExportSection extends ConsumerWidget {
   const new({super.key});
 
@@ -516,14 +514,7 @@ class ExportSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
     final format = ref.watch(exportFormatProvider);
-    final tally = ref.watch(tallyMatchProvider).value;
     final ios = context.isIos;
-
-    final tallySub = tally == null
-        ? ''
-        : tally.toMap == 0
-        ? l10n.reports_export_tallyAllMatched(tally.total)
-        : l10n.reports_export_tallySub(tally.matched, tally.total, tally.toMap);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -551,18 +542,17 @@ class ExportSection extends ConsumerWidget {
         ),
         const SizedBox(height: 10),
         SgSelectRow(
-          title: l10n.reports_export_tally,
-          subtitle: tallySub,
+          title: l10n.reports_export_csv,
+          subtitle: l10n.reports_export_csvSub,
           titleStyle: SgText.bodyStrong.copyWith(fontSize: 19),
           leading: const _FormatBadge(
-            'XML',
+            'CSV',
             SgColors.infoBg,
             SgColors.infoText,
           ),
-          selected: format == ExportFormat.tally,
-          onTap: () => ref
-              .read(exportFormatProvider.notifier)
-              .select(ExportFormat.tally),
+          selected: format == ExportFormat.csv,
+          onTap: () =>
+              ref.read(exportFormatProvider.notifier).select(ExportFormat.csv),
         ),
         const SizedBox(height: 14),
         SgButton(

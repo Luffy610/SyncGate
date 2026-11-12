@@ -167,9 +167,6 @@ abstract interface class ExportService {
     ExportFormat format,
     ReportFilter filter,
   );
-
-  /// Workers matched to Tally employees (design 16 caption).
-  Future<({int matched, int total})> tallyMatch();
 }
 
 abstract interface class BackupService {
@@ -183,12 +180,4 @@ abstract interface class LicenceService {
   Future<LicenceStatus> current();
   Future<Result<LicenceStatus, Failure>> activate(String key);
   Future<LicenceStatus> startTrial();
-}
-
-/// Which Tally Prime employee each worker is matched to (design 16).
-abstract interface class TallyMappingRepository {
-  /// Worker ID → Tally employee name, for matched workers only.
-  Stream<Map<String, String>> watch();
-  Future<Map<String, String>> all();
-  Future<void> set(String workerId, String tallyName);
 }

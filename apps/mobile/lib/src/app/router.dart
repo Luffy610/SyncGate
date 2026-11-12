@@ -155,10 +155,6 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
                     builder: (c, s) => const UsersScreen(),
                   ),
                   GoRoute(
-                    path: 'tally',
-                    builder: (c, s) => const TallyScreen(),
-                  ),
-                  GoRoute(
                     path: 'language',
                     builder: (c, s) => const LanguageSettingsScreen(),
                   ),

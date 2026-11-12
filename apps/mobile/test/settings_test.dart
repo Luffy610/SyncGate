@@ -36,7 +36,6 @@ void main() {
         'Users & PINs',
         'Shifts & rules',
         'Gate settings',
-        'Tally mapping',
         'Language',
         'Privacy & DPDP pack',
         'About SyncGate',
@@ -324,28 +323,6 @@ void main() {
         app.env.backend.audit.entries.map((e) => e.action),
         contains('user.pinChanged'),
       );
-    });
-  });
-
-  group('Tally mapping', () {
-    testWidgets('maps the one unmatched worker', (tester) async {
-      final app = await openSettings(tester);
-      await openPage(tester, 'Tally mapping');
-
-      expect(find.text('23 of 24 matched'), findsOneWidget);
-      expect(find.text('To map'), findsOneWidget);
-
-      await scrollTo(tester, find.text('Meena Kumari'));
-      await tester.tap(find.text('Meena Kumari'));
-      await tester.pumpAndSettle();
-      await tester.enterText(find.byType(TextField).last, 'MEENA K');
-      await tester.tap(find.text('Save').last);
-      await tester.pumpAndSettle();
-
-      expect(find.text('24 of 24 matched'), findsOneWidget);
-      expect(find.text('To map'), findsNothing);
-      final match = await app.env.backend.export.tallyMatch();
-      expect(match.matched, 24);
     });
   });
 

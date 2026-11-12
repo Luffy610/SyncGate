@@ -58,7 +58,6 @@ class DevEnvironment {
     auditLogProvider.overrideWithValue(backend.audit),
     reportServiceProvider.overrideWithValue(backend.reports),
     exportServiceProvider.overrideWithValue(backend.export),
-    tallyMappingProvider.overrideWithValue(backend.tally),
     backupServiceProvider.overrideWithValue(backend.backup),
     licenceServiceProvider.overrideWithValue(backend.licence),
     gateVisionProvider.overrideWithValue(gateVision),

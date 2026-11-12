@@ -60,6 +60,7 @@ SyncGate Phase 1 turns **one ordinary Android or iOS phone** into a complete att
 | [0020](0020-testing-strategy-and-ml-evaluation.md) | Test pyramid, device lab and a biometric evaluation harness | In review | Accepted | Quality |
 | [0021](0021-build-ci-cd-release-and-store-compliance.md) | GitHub Actions + Fastlane, flavours, signing, store compliance | In review | Accepted | Delivery |
 | [0022](0022-telemetry-diagnostics-and-support.md) | Opt-in, PII-free crash reports and an exportable diagnostic bundle | In review | Accepted | Operations |
+| [0023](0023-export-excel-and-csv-not-tally.md) | Payroll export is Excel and CSV; Tally XML dropped from Phase 1 (supersedes the Tally part of ADR-0015) | In review | Accepted | Product |
 
 ---
 

@@ -469,7 +469,7 @@ class DailyRow {
       inAt != null && outAt != null ? outAt!.difference(inAt!) : null;
 }
 
-enum ExportFormat { excel, tally }
+enum ExportFormat { excel, csv }
 
 @immutable
 class ExportResult {

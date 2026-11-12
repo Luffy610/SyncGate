@@ -176,9 +176,7 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets('lists Excel and Tally with the mapping status', (
-      tester,
-    ) async {
+    testWidgets('lists Excel and CSV', (tester) async {
       await openReports(tester);
       await tester.drag(
         find.byType(SingleChildScrollView).first,
@@ -189,11 +187,8 @@ void main() {
       expect(find.text('EXPORT FOR PAYROLL'), findsOneWidget);
       expect(find.text('Excel (.xlsx)'), findsOneWidget);
       expect(find.text('Template: Payroll — default columns'), findsOneWidget);
-      expect(find.text('Tally Prime (XML)'), findsOneWidget);
-      expect(
-        find.text('23 of 24 matched to Tally employees · 1 to map'),
-        findsOneWidget,
-      );
+      expect(find.text('CSV (.csv)'), findsOneWidget);
+      expect(find.text('Opens in any spreadsheet app'), findsOneWidget);
     });
 
     testWidgets('open exceptions ask for confirmation first', (tester) async {
@@ -259,7 +254,7 @@ void main() {
       expect(app.env.share.shared, hasLength(1));
     });
 
-    testWidgets('Tally exports XML for the filtered workers', (tester) async {
+    testWidgets('CSV exports the filtered workers', (tester) async {
       final app = await openReports(tester);
       await resolveAllExceptions(app);
       await tester.pumpAndSettle();
@@ -273,15 +268,15 @@ void main() {
         const Offset(0, -500),
       );
       await tester.pump();
-      await tester.tap(find.text('Tally Prime (XML)'));
+      await tester.tap(find.text('CSV (.csv)'));
       await tester.pump();
       await tester.tap(find.text('Export & share'));
       await tester.pump(const Duration(milliseconds: 600));
       await tester.pumpAndSettle();
 
-      expect(app.env.share.shared, ['syncgate-muster-2026-10.xml']);
+      expect(app.env.share.shared, ['syncgate-muster-2026-10.csv']);
       final (format, filter) = app.env.backend.export.exports.single;
-      expect(format, ExportFormat.tally);
+      expect(format, ExportFormat.csv);
       expect(filter.department, 'Packing');
     });
 
@@ -298,13 +293,16 @@ void main() {
   });
 
   group('menu and roles', () {
-    testWidgets('the menu opens the Tally mapping', (tester) async {
-      final app = await openReports(tester);
+    testWidgets('the menu offers column templates, which are coming soon', (
+      tester,
+    ) async {
+      await openReports(tester);
       await tester.tap(find.bySemanticsLabel('More'));
       await tester.pumpAndSettle();
-      await tester.tap(find.text('Tally mapping'));
-      await tester.pumpAndSettle();
-      expect(app.location, Routes.settingsTally);
+      await tester.tap(find.text('Column templates'));
+      await tester.pump();
+      expect(find.text('Coming soon'), findsOneWidget);
+      await tester.pumpAndSettle(const Duration(seconds: 4));
     });
 
     testWidgets('an admin can use Reports', (tester) async {
