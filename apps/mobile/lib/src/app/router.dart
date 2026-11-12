@@ -21,6 +21,7 @@ import 'package:syncgate/src/features/setup/kiosk_step.dart';
 import 'package:syncgate/src/features/setup/language_step.dart';
 import 'package:syncgate/src/features/setup/licence_step.dart';
 import 'package:syncgate/src/features/setup/owner_step.dart';
+import 'package:syncgate/src/features/setup/restore_screen.dart';
 import 'package:syncgate/src/features/setup/shift_step.dart';
 import 'package:syncgate/src/features/today/today_screen.dart';
 import 'package:syncgate/src/features/unlock/unlock_screen.dart';
@@ -47,6 +48,10 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((ref) {
       return redirectFor(mode, path);
     },
     routes: [
+      GoRoute(
+        path: Routes.setupRestore,
+        builder: (c, s) => const RestoreScreen(),
+      ),
       GoRoute(
         path: Routes.setupLanguage,
         builder: (c, s) => const LanguageStep(),

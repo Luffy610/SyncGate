@@ -105,9 +105,11 @@ abstract interface class AttendanceRepository {
   /// The most recent event for [workerId], or `null`.
   Future<AttendanceEvent?> lastEvent(String workerId);
 
-  /// Appends one event. The gate shows confirmation only after this returns
+  /// Appends one event and returns it as stored: the back end stamps the time
+  /// and direction, so show what is returned. The gate shows confirmation only
+  /// after this returns
   /// (NFR-REL-02).
-  Future<void> append(AttendanceEvent event);
+  Future<AttendanceEvent> append(AttendanceEvent event);
 }
 
 abstract interface class ExceptionRepository {
@@ -176,6 +178,18 @@ abstract interface class BackupService {
   Stream<BackupInfo> watch();
   Future<BackupInfo> current();
   Future<Result<BackupInfo, Failure>> backupNow();
+
+  /// Sets the passphrase that protects backups. It cannot be recovered: only
+  /// the owner knows it (NFR-SEC-04).
+  Future<Result<void, Failure>> setPassphrase(String passphrase);
+
+  /// Loads a `.sgbackup` file into a fresh install. Workers come back needing
+  /// a face because templates are never part of a backup. Returns the number
+  /// of records restored.
+  Future<Result<int, Failure>> restore({
+    required List<int> file,
+    required String passphrase,
+  });
 }
 
 abstract interface class LicenceService {

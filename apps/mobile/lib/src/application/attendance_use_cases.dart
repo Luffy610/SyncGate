@@ -38,7 +38,14 @@ class MarkAttendance {
   final SettingsRepository settings;
   final ClockService clock;
 
-  Future<Result<Marked, Failure>> call(String workerId) async {
+  /// [score], [margin] and [liveness] are what the on-device matcher reported;
+  /// they are stored with the event so low-margin marks can be reviewed.
+  Future<Result<Marked, Failure>> call(
+    String workerId, {
+    double? score,
+    double? margin,
+    double? liveness,
+  }) async {
     final worker = await workers.byId(workerId);
     if (worker == null || !worker.active) return const Result.err(NotFound());
 
@@ -64,9 +71,18 @@ class MarkAttendance {
       direction: direction,
       method: MarkMethod.face,
       onTime: onTime,
+      matchScore: score,
+      matchMargin: margin,
+      liveness: liveness,
     );
-    await attendance.append(event);
-    return Result.ok(Marked(worker: worker, event: event));
+    try {
+      // The back end may refuse (cooldown race, inactive worker) and decides
+      // the final time and direction, so show what it stored.
+      final stored = await attendance.append(event);
+      return Result.ok(Marked(worker: worker, event: stored));
+    } on FailureException catch (e) {
+      return Result.err(e.failure);
+    }
   }
 }
 
@@ -118,14 +134,19 @@ class MarkManualAttendance {
       reason: reason.name,
       markedBy: actor,
     );
-    await attendance.append(event);
+    final AttendanceEvent stored;
+    try {
+      stored = await attendance.append(event);
+    } on FailureException catch (e) {
+      return Result.err(e.failure);
+    }
     await exceptions.add(
       ExceptionRecord(
         id: newId('ex'),
         kind: ExceptionKind.manual,
         at: now,
         workerId: worker.id,
-        eventId: event.id,
+        eventId: stored.id,
         actor: actor,
         reason: reason,
       ),
@@ -138,7 +159,7 @@ class MarkManualAttendance {
         detail: '${worker.code} ${direction.name} ${reason.name}',
       ),
     );
-    return Result.ok(Marked(worker: worker, event: event));
+    return Result.ok(Marked(worker: worker, event: stored));
   }
 }
 

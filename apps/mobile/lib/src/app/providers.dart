@@ -52,6 +52,7 @@ final Provider<DeviceCheckService> deviceCheckProvider =
     _unwired<DeviceCheckService>();
 final Provider<ScreenService> screenProvider = _unwired<ScreenService>();
 final Provider<ShareService> shareProvider = _unwired<ShareService>();
+final Provider<FilePickService> filePickProvider = _unwired<FilePickService>();
 final Provider<BiometricService> biometricProvider =
     _unwired<BiometricService>();
 final Provider<QrScanService> qrScanProvider = _unwired<QrScanService>();

@@ -18,13 +18,16 @@ class FirstWorkerStep extends ConsumerWidget {
   static const step = 7;
 
   Future<void> _enrolNow(BuildContext context, WidgetRef ref) async {
+    // Finishing setup moves the app to the gate, which removes this screen
+    // while the calls below are still running (they are network calls with a
+    // real back end). So everything needed is taken before the first await.
     final controller = ref.read(appModeProvider.notifier);
-    await controller.completeSetup();
-    final owner = (await ref.read(userRepositoryProvider).users()).firstWhere(
-      (u) => u.role == Role.owner,
-    );
-    await controller.enterAdmin(owner);
-    if (context.mounted) context.go(Routes.enrolDetails);
+    final users = ref.read(userRepositoryProvider);
+    final router = GoRouter.of(context);
+    // The owner signed in when the PIN was created, so look them up first.
+    final owner = (await users.users()).firstWhere((u) => u.role == Role.owner);
+    await controller.completeSetupAndEnterAdmin(owner);
+    router.go(Routes.enrolDetails);
   }
 
   @override

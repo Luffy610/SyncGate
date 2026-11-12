@@ -143,9 +143,9 @@ class GateController extends Notifier<GateViewState> {
         if (state.phase == GatePhase.scanning) {
           state = state.copyWith(hint: issue);
         }
-      case Match(:final workerId):
+      case Match(:final workerId, :final score, :final margin, :final liveness):
         if (state.phase == GatePhase.scanning && !_processing) {
-          unawaited(_handleMatch(workerId));
+          unawaited(_handleMatch(workerId, score, margin, liveness));
         }
       case NoMatch():
         if (state.phase == GatePhase.scanning && !_processing) {
@@ -156,10 +156,17 @@ class GateController extends Notifier<GateViewState> {
     }
   }
 
-  Future<void> _handleMatch(String workerId) async {
+  Future<void> _handleMatch(
+    String workerId,
+    double score,
+    double margin,
+    double liveness,
+  ) async {
     _processing = true;
     try {
-      final result = await ref.read(markAttendanceProvider).call(workerId);
+      final result = await ref
+          .read(markAttendanceProvider)
+          .call(workerId, score: score, margin: margin, liveness: liveness);
       if (_disposed) return;
       final voice = ref.read(voiceProvider);
       switch (result) {

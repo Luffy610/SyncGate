@@ -2,10 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sg_domain/sg_domain.dart';
 import 'package:sg_l10n/sg_l10n.dart';
 import 'package:sg_ui/sg_ui.dart';
 import 'package:syncgate/src/app/providers.dart';
+import 'package:syncgate/src/app/routes.dart';
 import 'package:syncgate/src/features/setup/setup_scaffold.dart';
 
 /// Step 1: choose the app language (design 05). The choice applies at once.
@@ -43,6 +45,11 @@ class LanguageStep extends ConsumerWidget {
         SgButton(
           label: continueLabel,
           onPressed: () => unawaited(SetupNav.next(context, ref, step)),
+        ),
+        SgButton(
+          label: l10n.setup_language_restore,
+          kind: SgButtonKind.text,
+          onPressed: () => context.go(Routes.setupRestore),
         ),
       ],
       child: Column(
