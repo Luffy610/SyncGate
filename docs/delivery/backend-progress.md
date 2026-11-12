@@ -33,18 +33,18 @@ Each step is one branch with feature-scoped commits. Every step ended with the t
 
 | # | Step | Branch | Merged order | Done | Tests after the step |
 |---|---|---|---|---|---|
-| 1 | Spring Boot scaffold, typed config, startup guard, schema v1, hash-chain service, error model | `feature/backend-api-scaffold` | 1 | 28-10-2026 | builds |
-| 2 | PIN login (Argon2id), device token, recovery code, lockout, audit chain, security config | `feature/backend-auth-security` | 2 | 28-10-2026 | 9 server |
-| 3 | Workers, consents, shifts, settings | `feature/backend-workers-shifts-settings` | 3 | 28-10-2026 | 14 server |
-| 4 | Attendance events, manual marks, corrections, exceptions, face-recognition seam (mock) | `feature/backend-attendance-exceptions` | 4 | 28-10-2026 | 23 server |
-| 5 | Monthly muster, daily view, Excel and CSV export | `feature/backend-reports-export` | 5 | 28-10-2026 | 31 server |
-| 6 | Encrypted `.sgbackup`, passphrase, verified restore, nightly job | `feature/backend-backup-restore` | 6 | 28-10-2026 | 43 server |
-| 7 | Licence: trial, activation, dated states, signed token | `feature/backend-licence` | 7 | 28-10-2026 | 48 server |
-| 8 | CSV option in the app (its Tally removal is undone in step 10) | `feature/export-csv-frontend` | 8 | 28-10-2026 | 236 app |
-| 9 | Dart client `sg_api`, app wiring, server time, backend docs | `feature/flutter-api-client` | 9 | 28-10-2026 | 25 client + live run |
-| 10 | Tally restored and extended on the server (mapping + XML), CSV kept as third option, ADR-0023 | `feature/tally-export` | 10 | 28-10-2026 | 56 server, 27 client, 236 app |
-| 11 | Real Android services, restore screen, token revocation, setup-flow fixes, on-device full-stack test | `feature/android-platform-services` | 11 | 09-11-2026 | 58 server, 27 client, 242 app, device test |
-| 12 | This tracker and the pull-request guide | `docs/backend-progress` | 12 | 12-11-2026 | docs only |
+| 1 | Spring Boot scaffold, typed config, startup guard, schema v1, hash-chain service, error model | [`feature/backend-api-scaffold`](https://github.com/Luffy610/SyncGate/pull/3) (PR #3) | 1 | 28-10-2026 | builds |
+| 2 | PIN login (Argon2id), device token, recovery code, lockout, audit chain, security config | [`feature/backend-auth-security`](https://github.com/Luffy610/SyncGate/pull/4) (PR #4) | 2 | 28-10-2026 | 9 server |
+| 3 | Workers, consents, shifts, settings | [`feature/backend-workers-shifts-settings`](https://github.com/Luffy610/SyncGate/pull/5) (PR #5) | 3 | 28-10-2026 | 14 server |
+| 4 | Attendance events, manual marks, corrections, exceptions, face-recognition seam (mock) | [`feature/backend-attendance-exceptions`](https://github.com/Luffy610/SyncGate/pull/6) (PR #6) | 4 | 28-10-2026 | 23 server |
+| 5 | Monthly muster, daily view, Excel and CSV export | [`feature/backend-reports-export`](https://github.com/Luffy610/SyncGate/pull/7) (PR #7) | 5 | 28-10-2026 | 31 server |
+| 6 | Encrypted `.sgbackup`, passphrase, verified restore, nightly job | [`feature/backend-backup-restore`](https://github.com/Luffy610/SyncGate/pull/8) (PR #8) | 6 | 28-10-2026 | 43 server |
+| 7 | Licence: trial, activation, dated states, signed token | [`feature/backend-licence`](https://github.com/Luffy610/SyncGate/pull/9) (PR #9) | 7 | 28-10-2026 | 48 server |
+| 8 | CSV option in the app (its Tally removal is undone in step 10) | [`feature/export-csv-frontend`](https://github.com/Luffy610/SyncGate/pull/10) (PR #10) | 8 | 28-10-2026 | 236 app |
+| 9 | Dart client `sg_api`, app wiring, server time, backend docs | [`feature/flutter-api-client`](https://github.com/Luffy610/SyncGate/pull/11) (PR #11) | 9 | 28-10-2026 | 25 client + live run |
+| 10 | Tally restored and extended on the server (mapping + XML), CSV kept as third option, ADR-0023 | [`feature/tally-export`](https://github.com/Luffy610/SyncGate/pull/12) (PR #12) | 10 | 28-10-2026 | 56 server, 27 client, 236 app |
+| 11 | Real Android services, restore screen, token revocation, setup-flow fixes, on-device full-stack test | [`feature/android-platform-services`](https://github.com/Luffy610/SyncGate/pull/13) (PR #13) | 11 | 09-11-2026 | 58 server, 27 client, 242 app, device test |
+| 12 | This tracker and the pull-request guide | [`docs/backend-progress`](https://github.com/Luffy610/SyncGate/pull/14) (PR #14) | 12 | 12-11-2026 | docs only |
 
 ## 3. Bugs found by running the real stack (and fixed)
 
@@ -70,6 +70,6 @@ Each step is one branch with feature-scoped commits. Every step ended with the t
 
 ## 5. How to keep this page current
 
-* One row in section 2 per merged step; add the PR link when it exists (see [pull-requests.md](pull-requests.md)).
+* One row in section 2 per step; the PR link is in the Branch column (see [pull-requests.md](pull-requests.md)). PRs #3 to #14 were opened on 12-11-2026, all against `master`, with Luffy610 as reviewer, none merged yet.
 * When a bug is found by a real run, add it to section 3 with the step that fixed it.
 * Re-run `melos run analyze`, `melos run test`, `cd services/api && ./mvnw test` and the device test before changing a status to ✅.
