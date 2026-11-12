@@ -667,6 +667,8 @@ The reasoning behind each choice is in the [ADRs](docs/adr/README.md).
 | [docs/adr/](docs/adr/README.md) | Architecture decisions (ADR-0001 … ADR-0022) |
 | [docs/delivery/phase-1-delivery-plan.md](docs/delivery/phase-1-delivery-plan.md) | Milestones, sprints, epics and tasks |
 | [docs/delivery/frontend-implementation-plan.md](docs/delivery/frontend-implementation-plan.md) | How the Flutter app is built, screen by screen, and what is done |
+| [docs/delivery/backend-progress.md](docs/delivery/backend-progress.md) | Live progress tracker: state per layer, step log, bugs found, open items |
+| [docs/delivery/pull-requests.md](docs/delivery/pull-requests.md) | The pull requests for this work, merge order and descriptions |
 | [docs/backend/README.md](docs/backend/README.md) | Back end: how to run it, frontend-to-API map, API reference, security, where face code goes |
 | [docs/designs/](docs/designs) | Screen designs, iOS and Android (17 screens each) |
 
