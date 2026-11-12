@@ -1,0 +1,16 @@
+# Production: PostgreSQL, and every secret comes from the environment. The app
+# refuses to start if a secret is missing, short or still a development value.
+spring:
+  datasource:
+    url: ${SYNCGATE_DB_URL}
+    username: ${SYNCGATE_DB_USER}
+    password: ${SYNCGATE_DB_PASSWORD}
+
+syncgate:
+  security:
+    jwt-secret: ${SYNCGATE_JWT_SECRET}
+    master-key: ${SYNCGATE_MASTER_KEY}
+    device-keys: ${SYNCGATE_DEVICE_KEYS}
+    allowed-origins: ${SYNCGATE_ALLOWED_ORIGINS:}
+  licence:
+    mock: false
