@@ -1,0 +1,51 @@
+spring:
+  application:
+    name: syncgate-api
+  profiles:
+    default: dev
+  flyway:
+    locations: classpath:db/migration/common,classpath:db/migration/{vendor}
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 26MB
+
+server:
+  port: 8080
+  shutdown: graceful
+  error:
+    include-message: never
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+  max-http-request-header-size: 16KB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+
+syncgate:
+  zone: Asia/Kolkata
+  security:
+    admin-token-ttl: 30m
+    device-token-ttl: 30d
+    argon2-memory-kib: 16384
+    argon2-iterations: 3
+    allowed-origins: []
+  backup:
+    dir: ./data/backups
+    retention: 10
+    cron: "0 30 22 * * *"
+    argon2-memory-kib: 65536
+    argon2-iterations: 3
+  licence:
+    mock: false
+    trial-days: 30
+    validity-days: 365
+    checkin-days: 14
+    grace-days: 30

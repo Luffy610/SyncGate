@@ -234,6 +234,9 @@ class AttendanceEvent {
     this.reason,
     this.markedBy,
     this.onTime = true,
+    this.matchScore,
+    this.matchMargin,
+    this.liveness,
   });
 
   final String id;
@@ -248,6 +251,12 @@ class AttendanceEvent {
   /// Who made a manual mark or correction (e.g. "G-02", "Owner").
   final String? markedBy;
   final bool onTime;
+
+  /// What the on-device matcher reported for a face mark (null otherwise).
+  /// The server records them with the event; they are scores, not biometrics.
+  final double? matchScore;
+  final double? matchMargin;
+  final double? liveness;
 }
 
 enum ExceptionKind {
@@ -469,7 +478,7 @@ class DailyRow {
       inAt != null && outAt != null ? outAt!.difference(inAt!) : null;
 }
 
-enum ExportFormat { excel, tally }
+enum ExportFormat { excel, csv }
 
 @immutable
 class ExportResult {

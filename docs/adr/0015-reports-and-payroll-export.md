@@ -1,6 +1,6 @@
 # ADR-0015: On-device reports; Excel (.xlsx) and Tally Prime XML exports through the OS share sheet
 
-- **Status:** In review
+- **Status:** In review (the Tally Prime part is superseded by [ADR-0023](0023-export-excel-and-csv-not-tally.md))
 - **Proposed outcome:** Accepted (Tally Prime only for Phase 1 — confirms D-5 unless sales evidence says otherwise before M2)
 - **Date:** 24-10-2026
 - **Deciders:** Product, Engineering

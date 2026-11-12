@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/misc.dart' show Override;
+import 'package:sg_api/sg_api.dart' show ApiBackend;
 import 'package:sg_domain/sg_domain.dart';
 import 'package:sg_platform/sg_platform.dart';
 import 'package:syncgate/src/app/providers.dart';
@@ -12,7 +13,7 @@ import 'package:syncgate/src/dev/fakes/fake_vision.dart';
 /// Only `main_dev.dart` may import `src/dev/`, so none of this is compiled
 /// into staging or prod (checked by `tools/check_imports.dart`).
 class DevEnvironment {
-  new({bool freshInstall = true, ClockService? clock})
+  new({bool freshInstall = true, ClockService? clock, this.api})
     : backend = DemoBackend(
         ownerExists: !freshInstall,
         clock: clock,
@@ -32,6 +33,9 @@ class DevEnvironment {
     device = FakeDeviceCheckService();
   }
 
+  /// When set, the data layer is the real API instead of the demo fakes.
+  final ApiBackend? api;
+
   final DemoBackend backend;
   late final FakeGateVisionService gateVision;
   late final FakeEnrolmentCaptureService enrolment;
@@ -48,19 +52,7 @@ class DevEnvironment {
     devEnvironmentProvider.overrideWithValue(this),
     debugPanelBuilderProvider.overrideWithValue((_) => const DebugPanel()),
     clockProvider.overrideWithValue(backend.clock),
-    settingsRepositoryProvider.overrideWithValue(backend.settingsRepo),
-    workerRepositoryProvider.overrideWithValue(backend.workers),
-    attendanceRepositoryProvider.overrideWithValue(backend.attendance),
-    exceptionRepositoryProvider.overrideWithValue(backend.exceptions),
-    shiftRepositoryProvider.overrideWithValue(backend.shifts),
-    userRepositoryProvider.overrideWithValue(backend.users),
-    consentRepositoryProvider.overrideWithValue(backend.consent),
-    auditLogProvider.overrideWithValue(backend.audit),
-    reportServiceProvider.overrideWithValue(backend.reports),
-    exportServiceProvider.overrideWithValue(backend.export),
-    tallyMappingProvider.overrideWithValue(backend.tally),
-    backupServiceProvider.overrideWithValue(backend.backup),
-    licenceServiceProvider.overrideWithValue(backend.licence),
+    ..._data(),
     gateVisionProvider.overrideWithValue(gateVision),
     enrolmentCaptureProvider.overrideWithValue(enrolment),
     cameraCheckProvider.overrideWithValue(cameraCheck),
@@ -72,9 +64,51 @@ class DevEnvironment {
     biometricProvider.overrideWithValue(biometric),
     qrScanProvider.overrideWithValue(qr),
   ];
+
+  /// The data layer: the Spring Boot API when [api] is set, otherwise the
+  /// in-memory demo repositories.
+  List<Override> _data() {
+    final remote = api;
+    if (remote != null) {
+      return [
+        settingsRepositoryProvider.overrideWithValue(remote.settings),
+        workerRepositoryProvider.overrideWithValue(remote.workers),
+        attendanceRepositoryProvider.overrideWithValue(remote.attendance),
+        exceptionRepositoryProvider.overrideWithValue(remote.exceptions),
+        shiftRepositoryProvider.overrideWithValue(remote.shifts),
+        userRepositoryProvider.overrideWithValue(remote.users),
+        consentRepositoryProvider.overrideWithValue(remote.consent),
+        auditLogProvider.overrideWithValue(remote.audit),
+        reportServiceProvider.overrideWithValue(remote.reports),
+        exportServiceProvider.overrideWithValue(remote.export),
+        backupServiceProvider.overrideWithValue(remote.backup),
+        licenceServiceProvider.overrideWithValue(remote.licence),
+      ];
+    }
+    return [
+      settingsRepositoryProvider.overrideWithValue(backend.settingsRepo),
+      workerRepositoryProvider.overrideWithValue(backend.workers),
+      attendanceRepositoryProvider.overrideWithValue(backend.attendance),
+      exceptionRepositoryProvider.overrideWithValue(backend.exceptions),
+      shiftRepositoryProvider.overrideWithValue(backend.shifts),
+      userRepositoryProvider.overrideWithValue(backend.users),
+      consentRepositoryProvider.overrideWithValue(backend.consent),
+      auditLogProvider.overrideWithValue(backend.audit),
+      reportServiceProvider.overrideWithValue(backend.reports),
+      exportServiceProvider.overrideWithValue(backend.export),
+      backupServiceProvider.overrideWithValue(backend.backup),
+      licenceServiceProvider.overrideWithValue(backend.licence),
+    ];
+  }
 }
 
 /// Provider overrides for `main_dev.dart`. Set `--dart-define=DEV_START=gate`
 /// to skip the setup wizard (owner PIN 123456).
 List<Override> devOverrides({bool freshInstall = true}) =>
     DevEnvironment(freshInstall: freshInstall).overrides();
+
+/// Provider overrides for `main_dev_api.dart`: the same scripted camera and
+/// platform fakes, but every repository and service talks to the Spring Boot
+/// API, and time comes from the server.
+List<Override> devApiOverrides(ApiBackend api, ClockService clock) =>
+    DevEnvironment(clock: clock, api: api).overrides();

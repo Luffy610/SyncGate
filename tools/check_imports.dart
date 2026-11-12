@@ -32,13 +32,39 @@ final _rules = <_Rule>[
             !uri.startsWith('package:sg_domain/')),
   ),
   _Rule(
-    description: 'only main_dev.dart and src/dev/ may import dev-only code',
+    description:
+        'only main_dev.dart, main_dev_api.dart and src/dev/ may import dev-only '
+        'code',
     appliesTo: (p) =>
         p.startsWith('apps/mobile/lib/') &&
         p != 'apps/mobile/lib/main_dev.dart' &&
+        p != 'apps/mobile/lib/main_dev_api.dart' &&
         p != 'apps/mobile/lib/main.dart' &&
         !p.startsWith('apps/mobile/lib/src/dev/'),
     forbids: (uri) => uri.contains('src/dev/'),
+  ),
+  _Rule(
+    description:
+        'sg_api is pure Dart and depends only on sg_domain (no Flutter, no '
+        'dart:io, no other sg_*)',
+    appliesTo: (p) => p.startsWith('packages/sg_api/lib/'),
+    forbids: (uri) =>
+        uri.startsWith('package:flutter') ||
+        uri == 'dart:ui' ||
+        uri == 'dart:io' ||
+        (uri.startsWith('package:sg_') &&
+            !uri.startsWith('package:sg_domain/') &&
+            !uri.startsWith('package:sg_api/')),
+  ),
+  _Rule(
+    description:
+        'screens and use cases talk to sg_domain interfaces, never to the HTTP '
+        'client; only src/wiring, src/dev and the entry points import sg_api',
+    appliesTo: (p) =>
+        p.startsWith('apps/mobile/lib/src/features/') ||
+        p.startsWith('apps/mobile/lib/src/application/') ||
+        p.startsWith('apps/mobile/lib/src/app/'),
+    forbids: (uri) => uri.startsWith('package:sg_api/'),
   ),
   _Rule(
     description:

@@ -32,8 +32,6 @@ final Provider<ConsentRepository> consentRepositoryProvider =
     _unwired<ConsentRepository>();
 final Provider<AuditLog> auditLogProvider = _unwired<AuditLog>();
 final Provider<ReportService> reportServiceProvider = _unwired<ReportService>();
-final Provider<TallyMappingRepository> tallyMappingProvider =
-    _unwired<TallyMappingRepository>();
 final Provider<ExportService> exportServiceProvider = _unwired<ExportService>();
 final Provider<BackupService> backupServiceProvider = _unwired<BackupService>();
 final Provider<LicenceService> licenceServiceProvider =

@@ -77,3 +77,15 @@ final class Unexpected extends Failure {
 final class InvalidCorrection extends Failure {
   const new();
 }
+
+/// Thrown by a repository when the back end refuses an action for a reason
+/// the app understands (cooldown, manual limit, ...). Use cases catch it and
+/// turn it back into a [Failure] result.
+class FailureException implements Exception {
+  const new(this.failure);
+
+  final Failure failure;
+
+  @override
+  String toString() => 'FailureException($failure)';
+}

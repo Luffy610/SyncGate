@@ -146,6 +146,21 @@ class FakeBackupService implements BackupService {
     _info.value = BackupInfo(lastBackupAt: _now(), destination: 'Google Drive');
     return Result.ok(_info.value);
   }
+
+  /// The last passphrase set, so tests can check the screen passed it on.
+  String? passphrase;
+
+  @override
+  Future<Result<void, Failure>> setPassphrase(String passphrase) async {
+    this.passphrase = passphrase;
+    return const Result.ok(null);
+  }
+
+  @override
+  Future<Result<int, Failure>> restore({
+    required List<int> file,
+    required String passphrase,
+  }) async => const Result.err(Unexpected('Restore needs the real back end'));
 }
 
 class FakeLicenceService implements LicenceService {
@@ -353,11 +368,9 @@ class FakeReportService implements ReportService {
 }
 
 class FakeExportService implements ExportService {
-  new(this.reports, this.workers, this.tally);
+  new(this.reports);
 
   final ReportService reports;
-  final WorkerRepository workers;
-  final TallyMappingRepository tally;
   final exports = <(ExportFormat, ReportFilter)>[];
 
   @override
@@ -368,22 +381,12 @@ class FakeExportService implements ExportService {
     await Future<void>.delayed(const Duration(milliseconds: 400));
     final rows = await reports.monthly(filter);
     exports.add((format, filter));
-    final ext = format == ExportFormat.excel ? 'xlsx' : 'xml';
+    final ext = format == ExportFormat.excel ? 'xlsx' : 'csv';
     final month =
         '${filter.month.year}-${filter.month.month.toString().padLeft(2, '0')}';
     return Result.ok(
       ExportResult(path: 'syncgate-muster-$month.$ext', rows: rows.length),
     );
-  }
-
-  @override
-  Future<({int matched, int total})> tallyMatch() async {
-    final enrolled = (await workers.all())
-        .where((w) => w.active && w.faceStatus == FaceStatus.enrolled)
-        .toList();
-    final map = await tally.all();
-    final matched = enrolled.where((w) => map.containsKey(w.id)).length;
-    return (matched: matched, total: enrolled.length);
   }
 }
 
@@ -413,8 +416,7 @@ class DemoBackend {
       shifts: shifts,
       now: this.clock.now,
     );
-    tally = FakeTallyMappingRepository(this.seed);
-    export = FakeExportService(reports, workers, tally);
+    export = FakeExportService(reports);
   }
 
   final DemoSeed seed;
@@ -430,6 +432,5 @@ class DemoBackend {
   late final FakeBackupService backup;
   late final FakeLicenceService licence;
   late final FakeReportService reports;
-  late final FakeTallyMappingRepository tally;
   late final FakeExportService export;
 }
