@@ -402,6 +402,8 @@
   "reports_export_header": "वेतन के लिए एक्सपोर्ट",
   "reports_export_excel": "Excel (.xlsx)",
   "reports_export_excelSub": "टेम्पलेट: वेतन — डिफ़ॉल्ट कॉलम",
+  "reports_export_csv": "CSV (.csv)",
+  "reports_export_csvSub": "किसी भी स्प्रेडशीट ऐप में खुलता है",
   "reports_export_tally": "Tally Prime (XML)",
   "reports_export_tallySub": "{total} में से {matched} Tally कर्मचारियों से मिले · {toMap} मिलाने बाकी",
   "reports_export_tallyAllMatched": "सभी {total} Tally कर्मचारियों से मिले",

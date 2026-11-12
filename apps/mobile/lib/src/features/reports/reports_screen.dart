@@ -508,7 +508,7 @@ class _DailyList extends ConsumerWidget {
   }
 }
 
-/// "EXPORT FOR PAYROLL": pick Excel or Tally and share the file (design 16).
+/// "EXPORT FOR PAYROLL": pick Excel, CSV or Tally and share the file.
 class ExportSection extends ConsumerWidget {
   const new({super.key});
 
@@ -548,6 +548,20 @@ class ExportSection extends ConsumerWidget {
           onTap: () => ref
               .read(exportFormatProvider.notifier)
               .select(ExportFormat.excel),
+        ),
+        const SizedBox(height: 10),
+        SgSelectRow(
+          title: l10n.reports_export_csv,
+          subtitle: l10n.reports_export_csvSub,
+          titleStyle: SgText.bodyStrong.copyWith(fontSize: 19),
+          leading: const _FormatBadge(
+            'CSV',
+            SgColors.warningBg,
+            SgColors.warningText,
+          ),
+          selected: format == ExportFormat.csv,
+          onTap: () =>
+              ref.read(exportFormatProvider.notifier).select(ExportFormat.csv),
         ),
         const SizedBox(height: 10),
         SgSelectRow(

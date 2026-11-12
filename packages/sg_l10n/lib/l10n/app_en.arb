@@ -959,6 +959,8 @@
   "reports_export_header": "Export for payroll",
   "reports_export_excel": "Excel (.xlsx)",
   "reports_export_excelSub": "Template: Payroll — default columns",
+  "reports_export_csv": "CSV (.csv)",
+  "reports_export_csvSub": "Opens in any spreadsheet app",
   "reports_export_tally": "Tally Prime (XML)",
   "reports_export_tallySub": "{matched} of {total} matched to Tally employees · {toMap} to map",
   "@reports_export_tallySub": {

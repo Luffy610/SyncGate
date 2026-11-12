@@ -1,0 +1,6 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Development only: the dev flavour talks to the API on the host
+         machine over plain HTTP (http://10.0.2.2:8080 from the emulator).
+         Staging and prod keep cleartext traffic off (ADR-0017). -->
+    <application android:usesCleartextTraffic="true" />
+</manifest>

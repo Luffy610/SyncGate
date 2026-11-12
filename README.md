@@ -43,7 +43,7 @@ Privacy-first · DPDP-ready · Works with no internet · Android and iOS from on
 
 Small factories that employ contract and daily-wage workers still mark attendance on paper or with shared fingerprint machines. Both are slow, easy to cheat and hard to audit.
 
-SyncGate turns **one phone at the factory gate** into an attendance terminal. A worker looks at the phone, the app recognises the face in under a second and says their name aloud in their own language. The same phone doubles as the owner's **admin console**: enrol workers, fix mistakes, and export a muster roll for payroll (Excel or Tally).
+SyncGate turns **one phone at the factory gate** into an attendance terminal. A worker looks at the phone, the app recognises the face in under a second and says their name aloud in their own language. The same phone doubles as the owner's **admin console**: enrol workers, fix mistakes, and export a muster roll for payroll (Excel, CSV or Tally).
 
 - **Offline by design.** No internet is needed to mark attendance.
 - **Face templates never leave the phone.** They are stored encrypted on the device.
@@ -62,21 +62,22 @@ Phase 1 covers **one device and up to 25 workers per factory**. Multi-gate sync 
 | **Today** | Who is in, out, late or absent, live at the gate's pace, plus a count of records that need review. |
 | **Workers and enrolment** | Add workers, record consent, guided face capture, duplicate-face detection, deactivate or re-enrol. |
 | **Exceptions** | Review missing OUT marks and odd records; correct them with a reason, all of it audited. |
-| **Reports** | Monthly muster grid, Excel export for payroll, Tally mapping. |
+| **Reports** | Monthly muster grid, Excel, CSV and Tally export for payroll, Tally mapping. |
 | **Settings** | Shifts, users, backup (with passphrase), language, gate behaviour, privacy, licence and about. |
 | **Look and feel** | Native-feeling **iOS** and **Android** versions of every screen, from one set of components. |
 
 ## Project status
 
-> **Pre-alpha. The whole app runs on demo data.**
+> **Pre-alpha. The back end (Spring Boot API) is built and connected; face recognition is not written yet.**
 
 The Flutter front end for every Phase 1 screen is built and tested (steps F0–F5 of the [frontend plan](docs/delivery/frontend-implementation-plan.md)). It runs against in-memory fakes and a scripted camera, so you can try the full flow today without a face, a licence server or a database.
 
 | Stage | State |
 |---|---|
 | F0–F5: monorepo, design system, gate, setup, admin screens, reports, settings | ✅ Done, on demo data |
-| F6: real database (SQLCipher), native camera and face model, licence server, share/audio plugins | ⏳ Next |
-| F7: restore, Drive backup, more languages, store release | ⏳ Planned |
+| **Back end**: Spring Boot API, Dart client, app wired to it (`main_dev_api.dart`), 56 server + 27 client tests | ✅ Done, see [docs/backend](docs/backend/README.md) |
+| F6 (rest): native camera and face model (`sg_vision`), on-device kiosk/voice/share plugins | ⏳ Next (written separately) |
+| F7: restore screen, Google Drive client, more languages, store release | ⏳ Planned |
 | Golden (screenshot) tests, bundled fonts, iOS flavour schemes | ⏳ Need font files and a Mac |
 
 The **staging** and **prod** flavours deliberately show a "not connected to its back end yet" screen until F6 lands. Use **dev**.
@@ -482,10 +483,30 @@ flutter create --platforms=web --project-name syncgate .
 Then run:
 
 ```bash
-flutter run -d web-server --web-port 8080 -t lib/main_dev.dart --dart-define=BUILD_FLAVOUR=dev --dart-define=DEV_START=gate
+flutter run -d web-server --web-port 5000 -t lib/main_dev.dart --dart-define=BUILD_FLAVOUR=dev --dart-define=DEV_START=gate
 ```
 
-Open <http://localhost:8080> and make the window phone-sized (about 390 × 800). In Chrome press **F12**, then **Ctrl/Cmd + Shift + M** for device mode. The first compile takes a couple of minutes.
+Open <http://localhost:5000> and make the window phone-sized (about 390 × 800). In Chrome press **F12**, then **Ctrl/Cmd + Shift + M** for device mode. The first compile takes a couple of minutes.
+
+#### Option D — With the real back end (Spring Boot API)
+
+This runs the app against the Spring Boot API, so workers, marks, reports, exports and backups are stored in a
+database instead of memory. The camera is still the scripted one. You need **Java 17** (nothing else; the Maven
+wrapper downloads Maven).
+
+```bash
+# terminal 1: the API (dev profile, data kept in services/api/data)
+cd services/api
+./mvnw spring-boot:run
+
+# terminal 2: the app
+cd apps/mobile
+flutter run --flavor dev -t lib/main_dev_api.dart --dart-define-from-file=env/dev.json
+```
+
+From the Android emulator the API is `http://10.0.2.2:8080` (already set in `env/dev.json`). On a real phone, set
+`API_BASE_URL` to your computer's address. First launch shows the setup wizard because the server has no owner yet.
+Full guide, API reference and security notes: [docs/backend/README.md](docs/backend/README.md).
 
 #### All flavours
 
@@ -558,6 +579,8 @@ Run one package or one file:
 ```bash
 cd packages/sg_domain && dart test
 cd packages/sg_ui && flutter test
+cd packages/sg_api && dart test
+cd services/api && ./mvnw test
 cd apps/mobile && flutter test test/e2e_test.dart
 ```
 
@@ -615,12 +638,14 @@ packages/sg_ui/       Design tokens and adaptive iOS/Android components
 packages/sg_l10n/     Translations (ARB: English, Hindi) and Indian date/time formats
 packages/sg_platform/ Interfaces for kiosk, clock, voice, share, biometric, QR scan
 packages/sg_vision/   Interfaces for face capture and camera checks (native plugin comes in F6)
+packages/sg_api/      Dart HTTP client: implements the sg_domain repositories against the API
+services/api/         Spring Boot 4 back end (REST, auth, audit chain, reports, export, backup, licence)
 tools/                Repo scripts (import-boundary check)
 docs/                 PRD, architecture decisions, delivery plans, designs
 .github/workflows/    CI
 ```
 
-Planned, not yet in the repo: `packages/sg_data` (encrypted database), `services/licence` (Go licence server), `ml/` (models and evaluation), `apps/vision_bench` (ML benchmark). See [ADR-0003](docs/adr/0003-app-architecture-and-repository-layout.md).
+Back end (new): `services/api` (Spring Boot REST API, H2 in dev and PostgreSQL in prod) and `packages/sg_api` (the Dart client that implements the `sg_domain` interfaces over HTTP). Planned, not yet in the repo: the native `sg_vision` code, `ml/` (models and evaluation), `apps/vision_bench`. ADR-0003 and ADR-0010 describe an on-device database and a Go licence server; the Spring Boot service replaces both for now (see [docs/backend](docs/backend/README.md)).
 
 ## Architecture in brief
 
@@ -641,6 +666,7 @@ The reasoning behind each choice is in the [ADRs](docs/adr/README.md).
 | [docs/adr/](docs/adr/README.md) | Architecture decisions (ADR-0001 … ADR-0022) |
 | [docs/delivery/phase-1-delivery-plan.md](docs/delivery/phase-1-delivery-plan.md) | Milestones, sprints, epics and tasks |
 | [docs/delivery/frontend-implementation-plan.md](docs/delivery/frontend-implementation-plan.md) | How the Flutter app is built, screen by screen, and what is done |
+| [docs/backend/README.md](docs/backend/README.md) | Back end: how to run it, frontend-to-API map, API reference, security, where face code goes |
 | [docs/designs/](docs/designs) | Screen designs, iOS and Android (17 screens each) |
 
 ## Contributing

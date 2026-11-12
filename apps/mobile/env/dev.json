@@ -1,5 +1,7 @@
 {
   "BUILD_FLAVOUR": "dev",
   "LICENCE_BASE_URL": "https://licence.dev.syncgate.in",
-  "SENTRY_DSN": ""
+  "SENTRY_DSN": "",
+  "API_BASE_URL": "http://10.0.2.2:8080",
+  "DEVICE_KEY": "dev-device-key-local"
 }

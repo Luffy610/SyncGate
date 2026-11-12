@@ -146,6 +146,21 @@ class FakeBackupService implements BackupService {
     _info.value = BackupInfo(lastBackupAt: _now(), destination: 'Google Drive');
     return Result.ok(_info.value);
   }
+
+  /// The last passphrase set, so tests can check the screen passed it on.
+  String? passphrase;
+
+  @override
+  Future<Result<void, Failure>> setPassphrase(String passphrase) async {
+    this.passphrase = passphrase;
+    return const Result.ok(null);
+  }
+
+  @override
+  Future<Result<int, Failure>> restore({
+    required List<int> file,
+    required String passphrase,
+  }) async => const Result.err(Unexpected('Restore needs the real back end'));
 }
 
 class FakeLicenceService implements LicenceService {
@@ -368,7 +383,11 @@ class FakeExportService implements ExportService {
     await Future<void>.delayed(const Duration(milliseconds: 400));
     final rows = await reports.monthly(filter);
     exports.add((format, filter));
-    final ext = format == ExportFormat.excel ? 'xlsx' : 'xml';
+    final ext = switch (format) {
+      ExportFormat.excel => 'xlsx',
+      ExportFormat.csv => 'csv',
+      ExportFormat.tally => 'xml',
+    };
     final month =
         '${filter.month.year}-${filter.month.month.toString().padLeft(2, '0')}';
     return Result.ok(
