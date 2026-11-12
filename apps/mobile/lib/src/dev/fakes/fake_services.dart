@@ -146,6 +146,23 @@ class FakeBackupService implements BackupService {
     _info.value = BackupInfo(lastBackupAt: _now(), destination: 'Google Drive');
     return Result.ok(_info.value);
   }
+
+  /// The last passphrase set, so tests can check the screen passed it on.
+  String? passphrase;
+
+  @override
+  Future<Result<void, Failure>> setPassphrase(String passphrase) async {
+    this.passphrase = passphrase;
+    return const Result.ok(null);
+  }
+
+  @override
+  Future<Result<int, Failure>> restore({
+    required List<int> file,
+    required String passphrase,
+  }) async => passphrase == 'wrong'
+      ? const Result.err(Unexpected('Wrong passphrase, or the file is damaged'))
+      : Result.ok(file.length);
 }
 
 class FakeLicenceService implements LicenceService {
@@ -368,7 +385,11 @@ class FakeExportService implements ExportService {
     await Future<void>.delayed(const Duration(milliseconds: 400));
     final rows = await reports.monthly(filter);
     exports.add((format, filter));
-    final ext = format == ExportFormat.excel ? 'xlsx' : 'xml';
+    final ext = switch (format) {
+      ExportFormat.excel => 'xlsx',
+      ExportFormat.csv => 'csv',
+      ExportFormat.tally => 'xml',
+    };
     final month =
         '${filter.month.year}-${filter.month.month.toString().padLeft(2, '0')}';
     return Result.ok(
@@ -432,4 +453,14 @@ class DemoBackend {
   late final FakeReportService reports;
   late final FakeTallyMappingRepository tally;
   late final FakeExportService export;
+}
+
+/// Returns whatever file the test or debug session set up.
+class FakeFilePickService implements FilePickService {
+  new();
+
+  PickedFile? next = const PickedFile(name: 'demo.sgbackup', bytes: [1, 2, 3]);
+
+  @override
+  Future<PickedFile?> pickFile() async => next;
 }

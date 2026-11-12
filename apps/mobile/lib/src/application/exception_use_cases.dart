@@ -43,7 +43,12 @@ class CorrectRecord {
       reason: reason,
       markedBy: actor,
     );
-    await attendance.append(event);
+    final AttendanceEvent stored;
+    try {
+      stored = await attendance.append(event);
+    } on FailureException catch (e) {
+      return Result.err(e.failure);
+    }
     await exceptions.resolve(exception.id);
     final worker = await workers.byId(workerId);
     await audit.append(
@@ -57,7 +62,7 @@ class CorrectRecord {
             '${outAt.minute.toString().padLeft(2, '0')} ($reason)',
       ),
     );
-    return Result.ok(event);
+    return Result.ok(stored);
   }
 }
 

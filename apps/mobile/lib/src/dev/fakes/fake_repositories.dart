@@ -142,8 +142,9 @@ class FakeAttendanceRepository implements AttendanceRepository {
   }
 
   @override
-  Future<void> append(AttendanceEvent event) async {
+  Future<AttendanceEvent> append(AttendanceEvent event) async {
     _events.value = [..._events.value, event];
+    return event;
   }
 }
 

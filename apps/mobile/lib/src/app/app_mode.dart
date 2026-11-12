@@ -85,6 +85,28 @@ class AppModeController extends Notifier<AppMode> {
         );
   }
 
+  /// Finishes setup and goes straight into Admin as [owner] (the "enrol the
+  /// first worker now" path). The owner is already signed in from creating
+  /// the PIN, so the session simply continues: going through gate mode here
+  /// would end it and ask for the PIN again.
+  Future<void> completeSetupAndEnterAdmin(AppUser owner) async {
+    final now = ref.read(clockProvider).now();
+    state = AdminMode(AdminSession(user: owner, startedAt: now));
+    await _save((s) => s.copyWith(mode: AppModeKind.admin));
+    final audit = ref.read(auditLogProvider);
+    await audit.append(
+      AuditEntry(at: now, actor: 'Owner', action: 'setup.completed'),
+    );
+    await audit.append(
+      AuditEntry(
+        at: now,
+        actor: owner.name,
+        action: 'mode.admin',
+        detail: owner.role.name,
+      ),
+    );
+  }
+
   Future<void> enterAdmin(AppUser user) async {
     final now = ref.read(clockProvider).now();
     state = AdminMode(AdminSession(user: user, startedAt: now));

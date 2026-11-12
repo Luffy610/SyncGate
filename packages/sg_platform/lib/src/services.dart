@@ -67,3 +67,17 @@ abstract interface class QrScanService {
   /// Returns the scanned text, or `null` if the user cancelled.
   Future<String?> scan();
 }
+
+/// A file the user picked, read into memory.
+final class PickedFile {
+  const new({required this.name, required this.bytes});
+
+  final String name;
+  final List<int> bytes;
+}
+
+/// Lets the user choose a file from the phone (a `.sgbackup` to restore).
+abstract interface class FilePickService {
+  /// Returns null when the user cancels.
+  Future<PickedFile?> pickFile();
+}

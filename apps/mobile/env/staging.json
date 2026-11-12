@@ -1,5 +1,7 @@
 {
   "BUILD_FLAVOUR": "staging",
   "LICENCE_BASE_URL": "https://licence.staging.syncgate.in",
-  "SENTRY_DSN": ""
+  "SENTRY_DSN": "",
+  "API_BASE_URL": "https://api.staging.syncgate.in",
+  "DEVICE_KEY": ""
 }
