@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:${random.uuid};MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    username: sa
+    password: ""
+
+syncgate:
+  clock:
+    start: "2026-10-24T05:52:00+05:30"
+  security:
+    jwt-secret: test-jwt-secret-test-jwt-secret-test-jwt
+    master-key: dGVzdC1tYXN0ZXIta2V5LTMyLWJ5dGVzLXRlc3QhISE=
+    device-keys:
+      - test-device-key-0001
+    argon2-memory-kib: 1024
+    argon2-iterations: 1
+  backup:
+    dir: ./target/test-backups
+    argon2-memory-kib: 1024
+    argon2-iterations: 1
+  licence:
+    mock: true
