@@ -17,6 +17,7 @@ import 'package:sg_vision/sg_vision.dart';
 import 'package:sg_vision/testing.dart';
 import 'package:syncgate/src/app/app_mode.dart';
 import 'package:syncgate/src/app/routes.dart';
+import 'package:syncgate/src/features/enrolment/capture_controller.dart';
 
 import 'enrolment_test.dart' show agreeAndCapture, fillDetails, nextStep;
 import 'support/test_app.dart';
@@ -95,11 +96,15 @@ void main() {
     await agreeAndCapture(tester);
     expect(app.location, Routes.enrolFace);
 
-    // Front, left and right: 3 good frames each; then no mask sample.
+    // The first few frames only tell the pipeline which way up the camera
+    // is. Then front, left and right take 3 good frames each; no mask
+    // sample.
     final enrolFrames = (worker['enrol']! as List).cast<String>();
-    for (var i = 0; i < 9; i++) {
+    CaptureState capture() => app.container.read(captureControllerProvider);
+    for (var i = 0; i < 24 && capture().angle != CaptureAngle.mask; i++) {
       await show(enrolFrames[i % enrolFrames.length]);
     }
+    expect(capture().angle, CaptureAngle.mask);
     // The longer mask instruction pushes the button below the fold.
     await tester.ensureVisible(find.text('Skip mask sample'));
     await tester.pumpAndSettle();

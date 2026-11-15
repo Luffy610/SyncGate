@@ -12,7 +12,11 @@ final class FaceQuality {
     required this.faceLuma,
     required this.frameLuma,
     required this.sharpness,
+    this.roll = 0,
   });
+
+  /// See [DetectedFace.roll]: in-plane tilt in degrees, 0 = upright.
+  final double roll;
 
   /// Eye distance / the frame's longer side.
   final double interOcularFraction;
@@ -50,6 +54,7 @@ final class QualityPolicy {
   const new({
     this.minInterOcularFraction = 0.045,
     this.maxYaw = 0.95,
+    this.maxRoll = 45,
     this.minFaceLuma = 40,
     this.backlightDelta = 60,
     this.minSharpness = 20,
@@ -57,6 +62,10 @@ final class QualityPolicy {
 
   final double minInterOcularFraction;
   final double maxYaw;
+
+  /// Faces tilted further than this (degrees) are not used: either the
+  /// head is far over, or the frame is the wrong way up (see `UprightGuard`).
+  final double maxRoll;
   final double minFaceLuma;
 
   /// Frame brighter than the face by this much (with a dim face) = backlit.
@@ -76,6 +85,7 @@ final class QualityPolicy {
     if (q.frameLuma - q.faceLuma > backlightDelta && q.faceLuma < 80) {
       return QualityIssue.backlight;
     }
+    if (q.roll.abs() > maxRoll) return QualityIssue.turnLess;
     if (q.yaw.abs() > maxYaw) return QualityIssue.turnLess;
     if (q.sharpness < minSharpness) return QualityIssue.blurry;
     return null;
@@ -133,6 +143,7 @@ FaceQuality measureQuality(
 ) => FaceQuality(
   interOcularFraction: face.interOcular / math.max(frame.width, frame.height),
   yaw: face.yaw,
+  roll: face.roll,
   faceLuma: meanLuma(aligned),
   frameLuma: meanLuma(frame, step: 8),
   sharpness: laplacianVariance(aligned),

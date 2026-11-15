@@ -36,6 +36,10 @@ final class FaceMatcher {
   bool get isEmpty => _byWorker.isEmpty;
   int get workers => _byWorker.length;
 
+  /// How many workers have templates, counting only [only] if given.
+  int workersIn(Set<String>? only) =>
+      only == null ? workers : _byWorker.keys.where(only.contains).length;
+
   /// Per-worker best scores for [probe], restricted to [only] if given.
   Map<String, double> scores(Float32List probe, {Set<String>? only}) => {
     for (final MapEntry(key: id, value: vs) in _byWorker.entries)

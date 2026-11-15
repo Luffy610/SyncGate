@@ -28,8 +28,12 @@
   owner PIN 123456).
 
 .PARAMETER Rotation
-  Force the camera frame rotation: 0, 90, 180 or 270. Try 90 or 270 if
-  faces are never found.
+  Force the camera frame rotation: 0, 90, 180 or 270. Rarely needed: the
+  app works the orientation out from the first few faces it sees.
+
+.PARAMETER NoDiagnostics
+  Hide the live numbers shown over the camera preview (frame size, speed,
+  face and match scores). They are on by default and also printed here.
 
 .PARAMETER NoBootstrap
   Skip 'melos bootstrap' and code generation (faster when nothing changed).
@@ -48,6 +52,7 @@ param(
   [switch]$SetupWizard,
   [ValidateSet('', '0', '90', '180', '270')]
   [string]$Rotation = '',
+  [switch]$NoDiagnostics,
   [switch]$NoBootstrap
 )
 
@@ -126,11 +131,14 @@ $runArgs = @(
 if (-not $DemoCamera) { $runArgs += '--dart-define=VISION=real' }
 if (-not $SetupWizard) { $runArgs += '--dart-define=DEV_START=gate' }
 if ($Rotation) { $runArgs += "--dart-define=CAMERA_ROTATION=$Rotation" }
+$showDiagnostics = (-not $DemoCamera) -and (-not $NoDiagnostics)
+if ($showDiagnostics) { $runArgs += '--dart-define=VISION_DIAGNOSTICS=true' }
 
 Write-Step 'Building and installing (the first build takes several minutes)'
 if ($DemoCamera) { Write-Note 'Camera: demo camera' } else { Write-Note 'Camera: real camera + face models' }
 if ($SetupWizard) { Write-Note 'Start:  setup wizard' } else { Write-Note 'Start:  gate (admin PIN 123456)' }
 if ($DebugBuild) { Write-Note 'Debug build: face recognition will be slow; use the default release build to judge speed.' }
+if ($showDiagnostics) { Write-Note "Diagnostics: on. Lines starting [sg_vision] below are the face pipeline's live numbers." }
 Write-Note 'Press q in this window to stop the app.'
 
 Push-Location (Join-Path (Join-Path $RepoRoot 'apps') 'mobile')

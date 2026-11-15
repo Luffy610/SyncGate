@@ -36,6 +36,31 @@ enum FrameRotation {
   };
 
   final int degrees;
+
+  /// This rotation followed by [other].
+  FrameRotation operator +(FrameRotation other) =>
+      FrameRotation.fromDegrees(degrees + other.degrees);
+}
+
+/// [img] turned clockwise by [rotation] (a new image; [img] is untouched).
+RgbImage rotateRgb(RgbImage img, FrameRotation rotation) {
+  if (rotation == FrameRotation.r0) {
+    return RgbImage(img.width, img.height, Uint8List.fromList(img.data));
+  }
+  final r = _Rotator(img.width, img.height, rotation, 1);
+  final out = RgbImage.blank(r.outW, r.outH);
+  final s = img.data;
+  final d = out.data;
+  var o = 0;
+  for (var oy = 0; oy < r.outH; oy++) {
+    for (var ox = 0; ox < r.outW; ox++) {
+      final i = (r.sy(ox, oy) * img.width + r.sx(ox, oy)) * 3;
+      d[o++] = s[i];
+      d[o++] = s[i + 1];
+      d[o++] = s[i + 2];
+    }
+  }
+  return out;
 }
 
 int _clamp255(double v) => v < 0 ? 0 : (v > 255 ? 255 : v.round());

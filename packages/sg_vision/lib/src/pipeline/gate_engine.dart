@@ -28,7 +28,9 @@ final class GateRules {
   final MatchPreset preset;
 
   /// The same worker must win in [agree] of the last [window] analysed
-  /// frames, all within [span].
+  /// frames, all within [span]. On a slow phone, where frames arrive further
+  /// apart, the span stretches to fit [window] frames (never beyond
+  /// [decideWithin]), so agreement does not depend on the frame rate.
   final int window;
   final int agree;
   final Duration span;
@@ -64,10 +66,14 @@ final class AdaptiveCandidate {
 
 /// The result of feeding one frame to [GateEngine].
 final class GateStep {
-  const new(this.events, {this.adaptive});
+  const new(this.events, {this.adaptive, this.candidate});
 
   final List<VisionEvent> events;
   final AdaptiveCandidate? adaptive;
+
+  /// The best and runner-up workers for this frame, for diagnostics.
+  /// `null` when the frame was not matched (no usable face, or decided).
+  final MatchCandidate? candidate;
 }
 
 final class _Vote {
@@ -102,6 +108,8 @@ final class GateEngine {
   var _sawLowMargin = false;
   String? _lastMatched;
   DateTime? _lastMatchedAt;
+  DateTime? _lastFrameAt;
+  Duration _frameInterval = Duration.zero;
 
   /// Replaces the gallery. [active] limits matching to those workers (only
   /// active, enrolled workers may mark attendance).
@@ -112,6 +120,9 @@ final class GateEngine {
 
   double get _tMatch => thresholds.match(rules.preset);
 
+  /// Workers that can match right now (in the gallery and active).
+  int get galleryWorkers => _matcher.workersIn(_active);
+
   void _resetAttempt() {
     _votes.clear();
     _attemptStart = null;
@@ -120,6 +131,10 @@ final class GateEngine {
   }
 
   GateStep onFrame(FrameAnalysis a, DateTime at) {
+    // How fast this phone analyses frames, of any kind.
+    final previous = _lastFrameAt;
+    _lastFrameAt = at;
+    if (previous != null) _frameInterval = at.difference(previous);
     final face = a.face;
     if (face == null) {
       final last = _lastFaceAt;
@@ -149,9 +164,10 @@ final class GateEngine {
     final overThreshold = cand != null && cand.score >= _tMatch;
     final passes = overThreshold && cand.margin >= thresholds.margin;
     if (overThreshold && !passes) _sawLowMargin = true;
+    final span = _span;
     _votes
       ..add(_Vote(at, a, cand, passes: passes))
-      ..removeWhere((v) => at.difference(v.at) > rules.span);
+      ..removeWhere((v) => at.difference(v.at) > span);
     while (_votes.length > rules.window) {
       _votes.removeAt(0);
     }
@@ -169,13 +185,13 @@ final class GateEngine {
       if (live != null && liveScore < live.threshold) {
         // Same UI as no match: attackers learn nothing (ADR-0007).
         events.add(const NoMatch(NoMatchReason.livenessFail));
-        return GateStep(events);
+        return GateStep(events, candidate: cand);
       }
       final repeat =
           winner == _lastMatched &&
           _lastMatchedAt != null &&
           at.difference(_lastMatchedAt!) < rules.sameWorkerCooldown;
-      if (repeat) return GateStep(events);
+      if (repeat) return GateStep(events, candidate: cand);
       _lastMatched = winner;
       _lastMatchedAt = at;
       final score =
@@ -205,7 +221,7 @@ final class GateEngine {
               quality: quality,
             )
           : null;
-      return GateStep(events, adaptive: adaptive);
+      return GateStep(events, adaptive: adaptive, candidate: cand);
     }
 
     if (at.difference(_attemptStart!) >= rules.decideWithin) {
@@ -216,7 +232,15 @@ final class GateEngine {
         ),
       );
     }
-    return GateStep(events);
+    return GateStep(events, candidate: cand);
+  }
+
+  /// [GateRules.span], stretched to hold [GateRules.window] frames when
+  /// the phone analyses them slowly.
+  Duration get _span {
+    final needed = _frameInterval * (rules.window - 1) * 1.1;
+    if (needed <= rules.span) return rules.span;
+    return needed < rules.decideWithin ? needed : rules.decideWithin;
   }
 
   String? _winner() {

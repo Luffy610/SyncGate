@@ -8,6 +8,7 @@ BUILD_MODE="--release"
 REAL_CAMERA=1
 START_AT_GATE=1
 ROTATION=""
+DIAGNOSTICS=1
 BOOTSTRAP=1
 
 usage() {
@@ -27,7 +28,11 @@ Options:
       --setup-wizard      Start with the first-run setup wizard
                           (default: straight to the gate, owner PIN 123456).
       --rotation <deg>    Force the camera frame rotation: 0, 90, 180 or 270.
-                          Try 90 or 270 if faces are never found.
+                          Rarely needed: the app works the orientation out
+                          from the first few faces it sees.
+      --no-diagnostics    Hide the live numbers shown over the camera
+                          preview (frame size, speed, face and match scores).
+                          They are on by default and also printed here.
       --no-bootstrap      Skip 'melos bootstrap' and code generation
                           (faster when nothing changed since the last run).
   -h, --help              Show this help.
@@ -51,6 +56,7 @@ parse_args() {
         case "$2" in 0 | 90 | 180 | 270) ROTATION="$2" ;; *) die "--rotation must be 0, 90, 180 or 270" ;; esac
         shift 2
         ;;
+      --no-diagnostics) DIAGNOSTICS=0; shift ;;
       --no-bootstrap) BOOTSTRAP=0; shift ;;
       -h | --help) usage; exit 0 ;;
       *) usage >&2; die "unknown option: $1" ;;
@@ -109,6 +115,7 @@ build_run_args() {
   [[ $REAL_CAMERA -eq 1 ]] && RUN_ARGS+=(--dart-define=VISION=real)
   [[ $START_AT_GATE -eq 1 ]] && RUN_ARGS+=(--dart-define=DEV_START=gate)
   [[ -n $ROTATION ]] && RUN_ARGS+=("--dart-define=CAMERA_ROTATION=$ROTATION")
+  [[ $REAL_CAMERA -eq 1 && $DIAGNOSTICS -eq 1 ]] && RUN_ARGS+=(--dart-define=VISION_DIAGNOSTICS=true)
   return 0
 }
 
@@ -117,6 +124,7 @@ run_app() {
   note "Camera: $([[ $REAL_CAMERA -eq 1 ]] && echo 'real camera + face models' || echo 'demo camera')"
   note "Start:  $([[ $START_AT_GATE -eq 1 ]] && echo 'gate (admin PIN 123456)' || echo 'setup wizard')"
   [[ $BUILD_MODE == "--debug" ]] && note "Debug build: face recognition will be slow; use the default release build to judge speed."
+  [[ $REAL_CAMERA -eq 1 && $DIAGNOSTICS -eq 1 ]] && note "Diagnostics: on. Lines starting [sg_vision] below are the face pipeline's live numbers."
   note "Press q in this window to stop the app."
   cd "$REPO_ROOT/apps/mobile" || die "cannot find apps/mobile"
   exec flutter "${RUN_ARGS[@]}"

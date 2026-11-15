@@ -104,3 +104,17 @@ The pipeline is implemented in `packages/sg_vision` and evaluated in `ml/` ([rep
 | Model integrity | Model card with SHA-256 | SHA-256s in `assets/models/manifest.json`; the app refuses a model that does not match | |
 
 Thresholds per preset (`T_match`, margin, `T_dup`, `T_adapt`) are produced by `ml/eval/evaluate.py` and shipped in the manifest, as ADR-0009 asks.
+
+## Amendment 2 (15-11-2026): frame orientation is measured, not trusted
+
+**What happened.** The first run on an iPhone recognised people poorly and enrolment was erratic. Cause: `camera_avfoundation` delivers stream frames already upright for the way the phone is held, yet reports `sensorOrientation = 90` for every camera. `sg_vision` turned each frame by that value, so every face reached the models lying on its side. Reproduced on the LFW frames: turned 90°, the pipeline rejects **83 %** of genuine pairs (upright: 8 %), accepts more impostors, and the head-turn estimate saturates, which breaks the enrolment steps and the quality hints. Android (CameraX) does stream frames in sensor orientation, so it was not affected.
+
+**Decisions.**
+
+1. On iOS the camera source applies no rotation; on Android it applies the sensor orientation.
+2. The pipeline no longer trusts either. An **upright guard** (`pipeline/upright_guard.dart`) runs the detector in all four orientations on the first frames that contain a face and keeps the orientation where the detector is most confident and the face looks upright. Over five frames this chose correctly in every trial on LFW frames (one frame: 98 %). Until it settles, faces are detected but never matched or enrolled. Afterwards it costs nothing, and it recalibrates if faces keep appearing tilted (30 in a row).
+3. A face tilted more than 45° is never used for matching (`QualityPolicy.maxRoll`).
+4. The dev flavour can show **live diagnostics** (`VISION_DIAGNOSTICS=true`; on by default in `scripts/run-on-device`): frame size, applied correction, speed, detector confidence, head pose, light, sharpness and the best match score against its threshold, over the preview and in the console. Numbers and worker IDs only. It is never enabled in staging or prod.
+5. Two smaller robustness changes from the same review: the multi-frame agreement window stretches on phones that analyse frames slowly (ADR-0009 §2 still needs 2 of the last 3 frames), and the enrolment pose windows are wider (front within about 18°, sides beyond about 16° with no upper limit).
+
+**Lesson.** A host test with correctly oriented frames cannot catch a camera-contract error. The parity suite now feeds frames turned 90°, 180° and 270° and requires the pipeline to correct itself; device runs remain mandatory before any release (ADR-0020).

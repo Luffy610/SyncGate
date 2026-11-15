@@ -7,6 +7,7 @@ On-device face recognition for SyncGate: camera → detect → align → embed �
 ```
 front camera (YUV420 / BGRA, 640×480-class, 15 fps)
   → RawFrame ──(keep only latest)──► vision isolate
+      → upright guard: which way up is the frame?       (first few faces only)
       → BlazeFace short-range @128 (letterboxed)      detect
       → second BlazeFace pass on a crop of the face    refine keypoints
       → quality gate: size, light, backlight, yaw, blur → QualityHint
@@ -26,7 +27,8 @@ front camera (YUV420 / BGRA, 640×480-class, 15 fps)
 | Matching | `pipeline/matcher.dart`, `pipeline/gate_engine.dart` | ADR-0009 rule: `T_match`, margin, multi-frame agreement, retry window, cooldown, adaptive slot |
 | Enrolment | `pipeline/enrolment_engine.dart` | ADR-0008 guided capture, mean templates, duplicate check |
 | Templates | `pipeline/templates.dart` | `TemplateVault` interface + in-memory vault |
-| Runtime | `runtime/` | `CameraFrameSource`, `IsolateVisionRunner`, real `GateVisionService` / `EnrolmentCaptureService` / `CameraCheckService`, `VisionPreview` |
+| Orientation | `pipeline/upright_guard.dart` | Works out the real frame orientation from the first faces instead of trusting what the camera reports |
+| Runtime | `runtime/` | `CameraFrameSource`, `IsolateVisionRunner`, real `GateVisionService` / `EnrolmentCaptureService` / `CameraCheckService`, `VisionPreview`, `VisionDiagnostics` |
 
 The Python reference in [`ml/eval/pipeline.py`](../../ml/eval/pipeline.py) is the spec; `test/e2e/pipeline_parity_test.dart` checks this Dart port against it stage by stage.
 
@@ -71,4 +73,4 @@ flutter test test/e2e              # from packages/sg_vision
 - **Liveness / anti-spoofing (ADR-0007)** is not in this package yet. `GateEngine` takes a `LivenessEstimator` and rejects silently below its threshold, but no PAD model ships: it needs a model with a clean licence and the in-house attack set to calibrate it. Until then a printed photo of an enrolled worker can mark attendance.
 - **Encrypted template vault (ADR-0010)**: templates are kept in memory only.
 - **Mask-specific threshold** (`T_match_mask`, ADR-0009 §3): the mask slot is matched with the normal threshold.
-- **Device testing**: rotation, mirroring and the preview were written against the `camera` plugin API but not yet run on a phone.
+- **Device testing**: the first iPhone run exposed a wrong frame orientation (fixed; see ADR-0006 amendment 2). Speed and recognition on real phones still need measuring; run with diagnostics on (`scripts/run-on-device`) and read the `[sg_vision]` lines.

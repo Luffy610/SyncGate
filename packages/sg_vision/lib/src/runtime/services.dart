@@ -9,6 +9,7 @@ import 'package:sg_vision/src/pipeline/gate_engine.dart';
 import 'package:sg_vision/src/pipeline/matcher.dart';
 import 'package:sg_vision/src/pipeline/model_manifest.dart';
 import 'package:sg_vision/src/pipeline/templates.dart';
+import 'package:sg_vision/src/runtime/diagnostics.dart';
 import 'package:sg_vision/src/runtime/frames.dart';
 import 'package:sg_vision/src/runtime/model_assets.dart';
 import 'package:sg_vision/src/runtime/vision_runner.dart';
@@ -33,7 +34,8 @@ final class VisionStack {
     required this.loadAssets,
     this.clock = DateTime.now,
     this.onError,
-  });
+    bool diagnostics = false,
+  }) : diagnostics = diagnostics ? VisionDiagnostics() : null;
 
   final FrameSource source;
   final VisionRunner runner;
@@ -43,6 +45,9 @@ final class VisionStack {
   /// Called when a frame fails to analyse (the gate carries on with the
   /// next frame). For the diagnostics log (ADR-0022); never sees pixels.
   final void Function(Object error, StackTrace stack)? onError;
+
+  /// Live pipeline numbers for on-phone testing; `null` unless asked for.
+  final VisionDiagnostics? diagnostics;
 
   /// Loads (and integrity-checks) the models; called once.
   final Future<ModelAssets> Function() loadAssets;
@@ -86,6 +91,7 @@ final class VisionStack {
     unawaited(_frames?.cancel());
     _frames = null;
     _texture = null;
+    diagnostics?.clear();
     await source.stop();
   });
 
@@ -198,6 +204,7 @@ final class LiteRtGateVisionService implements GateVisionService {
   ModelManifest? _manifest;
   StreamSubscription<void>? _vaultSub;
   final _micros = <int>[];
+  var _lastDecision = 'none yet';
   DateTime? _statsFrom;
   var _lastLuma = 0.0;
 
@@ -245,6 +252,22 @@ final class LiteRtGateVisionService implements GateVisionService {
     if (engine == null) return;
     final step = engine.onFrame(a, at);
     step.events.forEach(_events.add);
+    final diagnostics = stack.diagnostics;
+    if (diagnostics != null) {
+      for (final e in step.events) {
+        if (e is Match) _lastDecision = 'MATCH ${e.workerId}';
+        if (e is NoMatch) _lastDecision = 'not recognised (${e.reason.name})';
+      }
+      diagnostics.record(
+        mode: 'gate',
+        analysis: a,
+        at: at,
+        candidate: step.candidate,
+        threshold: engine.thresholds.match(engine.rules.preset),
+        margin: engine.thresholds.margin,
+        note: 'gallery ${engine.galleryWorkers} · last: $_lastDecision',
+      );
+    }
     final adaptive = step.adaptive;
     if (adaptive != null) await _maybeAdapt(adaptive);
     _stats(a, at);
@@ -336,8 +359,16 @@ final class LiteRtEnrolmentCaptureService implements EnrolmentCaptureService {
       modelVersion: m.modelVersion,
       policy: policy,
     );
-    final pump = _pump = _FramePump(stack, AnalysisMode.enrolment, (a, _) {
-      _engine?.onFrame(a).forEach(_events.add);
+    final pump = _pump = _FramePump(stack, AnalysisMode.enrolment, (a, at) {
+      final engine = _engine;
+      if (engine == null) return;
+      engine.onFrame(a).forEach(_events.add);
+      stack.diagnostics?.record(
+        mode: 'enrol',
+        analysis: a,
+        at: at,
+        note: engine.progressNote,
+      );
     });
     return await pump.start();
   });
@@ -401,7 +432,8 @@ final class LiteRtCameraCheckService implements CameraCheckService {
   Future<int> start() => _serial.run(() async {
     await _stop();
     await stack.ready();
-    final pump = _pump = _FramePump(stack, AnalysisMode.gate, (a, _) {
+    final pump = _pump = _FramePump(stack, AnalysisMode.gate, (a, at) {
+      stack.diagnostics?.record(mode: 'check', analysis: a, at: at);
       _recent.add(a);
       if (_recent.length > window) _recent.removeAt(0);
     });

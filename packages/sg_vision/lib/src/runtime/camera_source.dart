@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:flutter/widgets.dart';
 import 'package:sg_vision/src/pipeline/rgb_image.dart';
+import 'package:sg_vision/src/runtime/diagnostics.dart';
 import 'package:sg_vision/src/runtime/frames.dart';
 
 /// The front camera through `package:camera`, streaming YUV (Android) or
@@ -54,8 +55,14 @@ final class CameraFrameSource implements FrameSource {
           : ImageFormatGroup.yuv420,
     );
     await controller.initialize();
+    // Android (CameraX) streams frames as the sensor sees them, so they
+    // need turning by the sensor orientation. iOS (AVFoundation) streams
+    // frames already upright for the way the phone is held, although the
+    // plugin still reports a sensor orientation of 90: turning those again
+    // lays every face on its side. The pipeline's upright guard corrects
+    // any phone that breaks these rules.
     final rotation = FrameRotation.fromDegrees(
-      rotationOverride ?? front.sensorOrientation,
+      rotationOverride ?? (Platform.isIOS ? 0 : front.sensorOrientation),
     );
     await controller.startImageStream((img) => _onImage(img, rotation));
     _controller = controller;
@@ -127,17 +134,58 @@ class VisionPreview extends StatelessWidget {
           if (controller != null &&
               controller.cameraId == textureId &&
               controller.value.isInitialized) {
-            return FittedBox(
-              fit: BoxFit.cover,
-              clipBehavior: Clip.hardEdge,
-              child: SizedBox(
-                width: controller.value.previewSize?.height ?? 480,
-                height: controller.value.previewSize?.width ?? 640,
-                child: controller.buildPreview(),
+            return _withDiagnostics(
+              FittedBox(
+                fit: BoxFit.cover,
+                clipBehavior: Clip.hardEdge,
+                child: SizedBox(
+                  width: controller.value.previewSize?.height ?? 480,
+                  height: controller.value.previewSize?.width ?? 640,
+                  child: controller.buildPreview(),
+                ),
               ),
             );
           }
-          return Texture(textureId: textureId);
+          return _withDiagnostics(Texture(textureId: textureId));
+        },
+      );
+
+  /// Lays the live pipeline numbers over [preview] when diagnostics are on.
+  static Widget _withDiagnostics(Widget preview) =>
+      ValueListenableBuilder<String?>(
+        valueListenable: VisionDiagnostics.overlay,
+        child: preview,
+        builder: (context, text, child) {
+          if (text == null) return child!;
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              child!,
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: IgnorePointer(
+                  child: ColoredBox(
+                    color: const Color(0xB3000000),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Text(
+                        text,
+                        style: const TextStyle(
+                          color: Color(0xFFFFFFFF),
+                          fontSize: 10,
+                          height: 1.25,
+                          fontFamily: 'monospace',
+                          decoration: TextDecoration.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
         },
       );
 }

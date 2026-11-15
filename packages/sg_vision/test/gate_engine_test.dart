@@ -66,11 +66,35 @@ void main() {
 
     test('frames further apart than the agreement span do not count', () {
       final e = engine();
+      // Two good frames 1.5 s apart, with blurry frames in between: the
+      // phone is fast, so the first has expired by the time of the second.
       final events = feed(e, [
         (0, analysisOf(withCosine(0, 0.9))),
+        for (var ms = 250; ms < 1500; ms += 250)
+          (ms, analysisOf(unit(0), issue: QualityIssue.blurry)),
         (1500, analysisOf(withCosine(0, 0.9))),
       ]);
       expect(events.whereType<Match>(), isEmpty);
+    });
+
+    test('slow phones still reach agreement: the span stretches', () {
+      final e = engine();
+      // 700 ms per frame: three frames no longer fit in one second.
+      final events = feed(e, [
+        (0, analysisOf(unit(5))),
+        (700, analysisOf(withCosine(0, 0.8))),
+        (1400, analysisOf(unit(5))),
+        (2100, analysisOf(withCosine(0, 0.8))),
+      ]);
+      expect(events.whereType<Match>().single.workerId, 'ramesh');
+    });
+
+    test('each matched frame reports its candidate for diagnostics', () {
+      final e = engine();
+      final step = e.onFrame(analysisOf(withCosine(1, 0.7)), at(0));
+      expect(step.candidate?.workerId, 'sunita');
+      expect(step.candidate?.score, closeTo(0.7, 1e-6));
+      expect(e.galleryWorkers, 2);
     });
 
     test('a look-alike (small margin) is "not recognised" after 2 s', () {

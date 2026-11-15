@@ -12,6 +12,10 @@ const _vision = String.fromEnvironment('VISION');
 /// frame rotation for phones that report it wrongly.
 const _rotation = int.fromEnvironment('CAMERA_ROTATION', defaultValue: -1);
 
+/// `--dart-define=VISION_DIAGNOSTICS=true` overlays live face-pipeline
+/// numbers on the camera preview and prints them to the console.
+const _diagnostics = bool.fromEnvironment('VISION_DIAGNOSTICS');
+
 Future<void> main() => bootstrap(
   AppConfig.resolve(Flavour.dev),
   overrides: devOverrides(
@@ -24,5 +28,8 @@ Future<void> main() => bootstrap(
     // Set by --dart-define=CAMERA_ROTATION; null without it.
     // ignore: avoid_redundant_argument_values
     cameraRotation: _rotation < 0 ? null : _rotation,
+    // Set by --dart-define=VISION_DIAGNOSTICS.
+    // ignore: avoid_redundant_argument_values
+    visionDiagnostics: _diagnostics,
   ),
 );

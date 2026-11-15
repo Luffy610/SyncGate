@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:isolate';
 
 import 'package:sg_vision/src/pipeline/enrolment_engine.dart';
+import 'package:sg_vision/src/pipeline/face_detector.dart';
 import 'package:sg_vision/src/pipeline/face_pipeline.dart';
 import 'package:sg_vision/src/pipeline/quality.dart';
+import 'package:sg_vision/src/pipeline/rgb_image.dart';
+import 'package:sg_vision/src/pipeline/upright_guard.dart';
 import 'package:sg_vision/src/runtime/frames.dart';
 import 'package:sg_vision/src/runtime/model_assets.dart';
 
@@ -32,12 +35,47 @@ abstract interface class VisionRunner {
   Future<void> close();
 }
 
-FrameAnalysis _analyse(FacePipeline p, RawFrame frame, AnalysisMode mode) {
-  final rgb = frame.toRgb();
+/// Converts [frame], makes it upright with [guard], analyses it and wipes
+/// every copy of the pixels.
+FrameAnalysis _analyse(
+  FacePipeline p,
+  UprightGuard guard,
+  RawFrame frame,
+  AnalysisMode mode,
+) {
+  final raw = frame.toRgb();
+  var rgb = raw;
   try {
-    return p.analyse(rgb, policy: _policyFor(mode));
+    if (!guard.settled) {
+      // Calibrating: which way up is this camera really? One quick
+      // detector pass per orientation, for the first few faces only.
+      final faces = <FrameRotation, DetectedFace?>{};
+      for (final rotation in FrameRotation.values) {
+        if (rotation == FrameRotation.r0) {
+          faces[rotation] = p.detector.detect(raw, refine: false);
+        } else {
+          final turned = rotateRgb(raw, rotation);
+          faces[rotation] = p.detector.detect(turned, refine: false);
+          turned.wipe();
+        }
+      }
+      guard.vote(faces);
+    }
+    final calibrating = !guard.settled;
+    if (guard.correction != FrameRotation.r0) {
+      rgb = rotateRgb(raw, guard.correction);
+    }
+    final analysis = p.analyse(rgb, policy: _policyFor(mode));
+    guard.observe(analysis.face);
+    // Until the orientation is settled a face may be the wrong way up, so
+    // it must not be matched or enrolled.
+    return analysis.withRotationFix(
+      guard.correction.degrees,
+      keepEmbedding: !calibrating,
+    );
   } finally {
     rgb.wipe();
+    raw.wipe();
     frame.wipe();
   }
 }
@@ -45,6 +83,7 @@ FrameAnalysis _analyse(FacePipeline p, RawFrame frame, AnalysisMode mode) {
 /// Runs on the calling isolate. For tests and tools.
 final class InlineVisionRunner implements VisionRunner {
   FacePipeline? _pipeline;
+  final _guard = UprightGuard();
 
   @override
   Future<void> load(ModelAssets assets) async {
@@ -58,7 +97,7 @@ final class InlineVisionRunner implements VisionRunner {
   @override
   Future<FrameAnalysis> analyse(RawFrame frame, AnalysisMode mode) async {
     final p = _pipeline ?? (throw StateError('models not loaded'));
-    return _analyse(p, frame, mode);
+    return _analyse(p, _guard, frame, mode);
   }
 
   @override
@@ -188,11 +227,12 @@ void _visionMain(_Init init) {
     return;
   }
   init.reply.send(const _Loaded());
+  final guard = UprightGuard();
   port.listen((msg) {
     switch (msg) {
       case _Analyse(:final id, :final frame, :final mode):
         try {
-          init.reply.send(_Result(id, _analyse(pipeline, frame, mode)));
+          init.reply.send(_Result(id, _analyse(pipeline, guard, frame, mode)));
         } on Object catch (e) {
           init.reply.send(_Failed(id, '$e'));
         }

@@ -537,7 +537,9 @@ scripts/run-on-device/macos/ios.sh
 scripts\run-on-device\windows\android.cmd
 ```
 
-Useful options: `--device <id>` to pick a phone, `--rotation 90|270` if the camera image is sideways or faces are never found, `--debug` for hot reload (slower recognition), `--setup-wizard`, `--demo-camera`. On Windows the same options are `-Device`, `-Rotation`, `-DebugBuild`, `-SetupWizard` and `-DemoCamera`. All of them, what to try once the app is running, and fixes for common problems are in [the scripts' README](scripts/run-on-device/README.md).
+While the real camera runs, a strip over the preview shows **live diagnostics** (frame size, speed, face and match scores), and the same numbers are printed in the terminal on lines starting `[sg_vision]`. If recognition looks wrong, those lines say why; send them with the phone model.
+
+Useful options: `--device <id>` to pick a phone, `--debug` for hot reload (slower recognition), `--setup-wizard`, `--demo-camera`, `--no-diagnostics`, and `--rotation 90|180|270` to force the camera orientation (rarely needed: the app works it out from the first few faces). On Windows the same options are `-Device`, `-DebugBuild`, `-SetupWizard`, `-DemoCamera`, `-NoDiagnostics` and `-Rotation`. All of them, what to try once the app is running, and fixes for common problems are in [the scripts' README](scripts/run-on-device/README.md).
 
 ---
 

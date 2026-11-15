@@ -96,14 +96,19 @@ class DevEnvironment {
 /// to skip the setup wizard (owner PIN 123456), and
 /// `--dart-define=VISION=real` to use the phone's camera and the real face
 /// models on the demo data (`CAMERA_ROTATION=90|270|…` forces the frame
-/// rotation).
+/// rotation; `VISION_DIAGNOSTICS=true` shows live pipeline numbers over the
+/// camera preview and in the console).
 List<Override> devOverrides({
   bool freshInstall = true,
   bool realVision = false,
   int? cameraRotation,
+  bool visionDiagnostics = false,
 }) => DevEnvironment(
   freshInstall: freshInstall,
   realVision: realVision
-      ? deviceVisionStack(cameraRotation: cameraRotation)
+      ? deviceVisionStack(
+          cameraRotation: cameraRotation,
+          diagnostics: visionDiagnostics,
+        )
       : null,
 ).overrides();

@@ -18,9 +18,9 @@ final class EnrolmentPolicy {
       CaptureAngle.mask,
     ],
     this.framesPerAngle = 3,
-    this.frontMaxYaw = 0.3,
-    this.sideMinYaw = 0.3,
-    this.sideMaxYaw = 0.95,
+    this.frontMaxYaw = 0.4,
+    this.sideMinYaw = 0.35,
+    this.sideMaxYaw = 1.01,
     this.consistency = 0.3,
     this.quality = const QualityPolicy(maxYaw: 1.01),
     this.requirePose = true,
@@ -38,6 +38,11 @@ final class EnrolmentPolicy {
 
   /// Good frames needed per angle (ADR-0008: ≥ 3).
   final int framesPerAngle;
+
+  /// Yaw limits per angle, in `DetectedFace.yaw` units (about 1.2 × tan of
+  /// the head turn: 0.4 ≈ 18°, 0.35 ≈ 16°, 1.0 ≈ 40° and beyond). "Front"
+  /// accepts a face roughly towards the camera; a side needs a clear turn,
+  /// with no upper limit (the detector loses a full profile on its own).
   final double frontMaxYaw;
   final double sideMinYaw;
   final double sideMaxYaw;
@@ -90,6 +95,14 @@ final class EnrolmentEngine {
 
   /// All required angles captured (mask counts only if not skipped).
   bool get complete => current == null;
+
+  /// "front 2/3"-style progress, for diagnostics.
+  String get progressNote {
+    final angle = current;
+    if (angle == null) return 'capture complete';
+    final got = _frames[angle]?.length ?? 0;
+    return 'capture ${angle.name} $got/${policy.framesPerAngle}';
+  }
 
   /// Feeds one analysed frame (use [EnrolmentPolicy.quality] in the
   /// pipeline). Returns the events for the capture screen.

@@ -24,7 +24,7 @@ Each script:
 1. checks Flutter (and Xcode/CocoaPods for iOS) and warns if Flutter isn't the pinned version;
 2. installs Melos if needed, then runs `melos bootstrap` and `melos run gen`;
 3. finds the connected phone, and tells you what to fix if it isn't ready;
-4. runs `flutter run --release` on it, starting at the gate (owner PIN **123456**) with the real camera.
+4. runs `flutter run --release` on it, starting at the gate (owner PIN **123456**) with the real camera and **live diagnostics** over the camera preview.
 
 Device detection is shared by both OSes: `tools/device.dart`, which reads `flutter devices --machine`.
 
@@ -81,7 +81,8 @@ The first build takes several minutes; later ones are much faster. Press **q** i
 | `--profile` | `-ProfileBuild` | Near-release speed, with Flutter DevTools. |
 | `--demo-camera` | `-DemoCamera` | Scripted demo camera instead of the real one. |
 | `--setup-wizard` | `-SetupWizard` | Start with the first-run setup wizard instead of the gate. |
-| `--rotation <0\|90\|180\|270>` | `-Rotation <0\|90\|180\|270>` | Force the camera frame rotation (see below). |
+| `--rotation <0\|90\|180\|270>` | `-Rotation <0\|90\|180\|270>` | Force the camera frame rotation. Rarely needed: the app works the orientation out from the first few faces it sees. |
+| `--no-diagnostics` | `-NoDiagnostics` | Hide the live numbers over the camera preview (on by default; see below). |
 | `--no-bootstrap` | `-NoBootstrap` | Skip `melos bootstrap` and code generation when nothing changed. |
 | `-h`, `--help` | `Get-Help .\android.ps1 -Detailed` | Show the options. |
 
@@ -100,6 +101,35 @@ Things to know:
 - Face codes are kept in memory for now, so they are lost when the app restarts.
 - There is no anti-spoofing yet (ADR-0007): a photo of an enrolled face will also match.
 
+## Reading the diagnostics
+
+While the real camera runs, a small strip over the preview shows what the face pipeline sees, and the same text is printed in the terminal once a second on lines starting `[sg_vision]`. It contains numbers and worker IDs only, never images. Example at the gate:
+
+```
+gate 480x640 fix 0° 9.8 fps 61 ms
+face 0.93 size 9.1% yaw +0.08 roll -2° luma 121 sharp 180 ok
+best w-new-100 0.71 (need 0.48) lead 0.52 (need 0.08)
+gallery 1 · last: MATCH w-new-100
+```
+
+| Part | Meaning | Healthy |
+|---|---|---|
+| `480x640` | Frame size after rotation | Taller than wide when the phone is upright |
+| `fix 0°` | Extra turn the app applied because the camera's reported orientation was wrong; `(calibrating)` for the first few faces after the camera starts | Any value, as long as it stops changing |
+| `fps`, `ms` | Frames analysed per second; time per frame | 5 fps or more; under 200 ms |
+| `face 0.93` | Detector confidence (`no face` when nothing is found) | 0.8 or more |
+| `size` | Distance between the eyes as a share of the frame | 4.5 % or more (else "come closer") |
+| `yaw`, `roll` | Head turn left/right (0 = straight, ±1 = side-on) and tilt in degrees | Near 0 when you look straight |
+| `luma`, `sharp` | Face brightness (0–255) and sharpness | 40 or more; 20 or more |
+| last word | `ok`, or why the frame was not used: `tooDark`, `backlight`, `tooFar`, `turnLess`, `blurry` | `ok` |
+| `best … (need …)` | Closest enrolled worker, the score, and the score needed | Your score well above the need; a stranger's below it |
+| `lead … (need …)` | Gap to the second-closest worker (`n/a` with one worker enrolled) | Above the need |
+| `gallery`, `last` | Workers who can match now; the last decision | |
+
+During enrolment the last line reads `capture front 2/3`: the step being captured and how many good frames it has. If a step does not advance, watch `yaw`: the front step wants it between −0.4 and +0.4, and each side wants it beyond ±0.35 (left and right in opposite directions).
+
+**If recognition looks wrong, send us the `[sg_vision]` lines** from the terminal (copy a dozen from when it went wrong) and the phone model. That is enough to tell a camera problem from a matching problem.
+
 ## If something goes wrong
 
 | What you see | Try |
@@ -108,6 +138,7 @@ Things to know:
 | iPhone "connected but not ready" | Unlock it, tap **Trust**, turn on Developer Mode, and check it appears in Xcode → *Window → Devices and Simulators*. |
 | Signing / provisioning errors (iOS) | Pick a team in Xcode (see above); make the bundle ID unique. |
 | CocoaPods errors (iOS) | `cd apps/mobile/ios && pod install --repo-update`, then run the script again. |
-| Preview sideways, or the capture ring never moves | The phone reports its camera rotation wrongly. Run again with `--rotation 270` (Windows: `-Rotation 270`), then `90` if that doesn't help. Please tell us the phone model. |
+| Faces rarely found, people not recognised | Look at the diagnostics. `fix` should settle after the first few faces and `roll` should be near 0° when you look straight. If `roll` stays near ±90° or `no face` shows while you face the camera, run again with `--rotation 90` (then `270`, `180`; Windows: `-Rotation`) and tell us the phone model and the `[sg_vision]` lines. |
+| A capture step never completes | Watch `yaw` and the `capture …` line in the diagnostics (see above); turn your head further, slowly, and keep it there for a second. |
 | Recognition feels slow | Make sure you didn't pass `--debug`; the default release build is much faster. |
 | Anything else | `flutter doctor -v`, and the [Troubleshooting](../../README.md#troubleshooting) table. |

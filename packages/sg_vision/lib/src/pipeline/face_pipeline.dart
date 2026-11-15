@@ -20,7 +20,38 @@ final class FrameAnalysis {
     this.quality,
     this.issue,
     this.embedding,
+    this.rotationFix = 0,
+    this.calibrating = false,
   });
+
+  /// This analysis, noting the orientation correction that was applied.
+  /// Without [keepEmbedding] the face vector is zeroed and dropped (the
+  /// orientation is still being worked out, so it must not be matched).
+  FrameAnalysis withRotationFix(int degrees, {bool keepEmbedding = true}) {
+    if (!keepEmbedding) embedding?.fillRange(0, embedding!.length, 0);
+    return _withFix(
+      degrees,
+      keepEmbedding ? embedding : null,
+      calibrating: !keepEmbedding,
+    );
+  }
+
+  FrameAnalysis _withFix(
+    int degrees,
+    Float32List? embedding, {
+    required bool calibrating,
+  }) => FrameAnalysis(
+    frameWidth: frameWidth,
+    frameHeight: frameHeight,
+    micros: micros,
+    frameLuma: frameLuma,
+    face: face,
+    quality: quality,
+    issue: issue,
+    embedding: embedding,
+    rotationFix: degrees,
+    calibrating: calibrating,
+  );
 
   final int frameWidth;
   final int frameHeight;
@@ -38,6 +69,14 @@ final class FrameAnalysis {
 
   /// Unit face vector; set only for usable faces.
   final Float32List? embedding;
+
+  /// Extra clockwise turn (degrees) the upright guard applied to the frame
+  /// because the camera's reported orientation was wrong. 0 normally.
+  final int rotationFix;
+
+  /// The upright guard is still working out the frame orientation; the
+  /// face was detected but deliberately not turned into a face vector.
+  final bool calibrating;
 
   bool get usable => face != null && issue == null && embedding != null;
 

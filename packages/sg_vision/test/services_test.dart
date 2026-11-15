@@ -114,6 +114,48 @@ void main() {
     },
   );
 
+  test('diagnostics describe each frame without pixels', () async {
+    final lines = <String>[];
+    final diagnostics = VisionDiagnostics(log: lines.add);
+    final stackWithDiagnostics = VisionStack(
+      source: source,
+      runner: runner,
+      vault: vault,
+      loadAssets: () async => ModelAssets.fromDirectory(modelsDir),
+      clock: () => t,
+      diagnostics: true,
+    );
+    expect(stackWithDiagnostics.diagnostics, isNotNull);
+    expect(stack.diagnostics, isNull);
+
+    diagnostics
+      ..record(
+        mode: 'gate',
+        analysis: analysisOf(unit(0)),
+        at: t,
+        candidate: const MatchCandidate(
+          workerId: 'w1',
+          score: 0.71,
+          runnerUpId: 'w2',
+          runnerUpScore: 0.2,
+        ),
+        threshold: 0.48,
+        margin: 0.08,
+        note: 'gallery 2 · last: MATCH w1',
+      )
+      ..record(
+        mode: 'gate',
+        analysis: analysisOf(null, face: false),
+        at: t.add(const Duration(milliseconds: 200)),
+      );
+    expect(lines.single, startsWith('[sg_vision] gate 640x480 fix 0°'));
+    expect(lines.single, contains('best w1 0.71 (need 0.48) lead 0.51'));
+    expect(lines.single, contains('yaw +0.00'));
+    expect(VisionDiagnostics.overlay.value, contains('no face'));
+    diagnostics.clear();
+    expect(VisionDiagnostics.overlay.value, isNull);
+  });
+
   test('camera check reads light, backlight, lens and distance', () {
     final reading = LiteRtCameraCheckService.readingFrom([
       analysisOf(unit(0)),

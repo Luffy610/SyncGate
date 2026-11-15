@@ -37,6 +37,18 @@ final class DetectedFace {
   double get interOcular =>
       this[FaceKeypoint.rightEye].distanceTo(this[FaceKeypoint.leftEye]);
 
+  /// In-plane tilt in degrees: the direction from between the eyes to the
+  /// mouth, measured from "straight down". 0 is upright; ±90 means the face
+  /// lies on its side (the frame is rotated); 180 is upside down.
+  double get roll {
+    final r = this[FaceKeypoint.rightEye];
+    final l = this[FaceKeypoint.leftEye];
+    final m = this[FaceKeypoint.mouthCentre];
+    final dx = m.x - (r.x + l.x) / 2;
+    final dy = m.y - (r.y + l.y) / 2;
+    return math.atan2(dx, dy) * 180 / math.pi;
+  }
+
   /// Signed head-yaw proxy in [-1, 1]: where the nose sits between the ears.
   /// 0 is frontal; the sign flips with the turn direction (and with mirrored
   /// frames, so callers must not rely on which sign means "left").
