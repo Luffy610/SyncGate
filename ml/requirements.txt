@@ -1,0 +1,5 @@
+# Evaluation and fixtures (ml/eval, ml/scripts/make_e2e_fixtures.py).
+# Pinned to the versions the published report was produced with.
+ai-edge-litert==2.1.2
+numpy==2.2.6
+opencv-python-headless==5.0.0.93

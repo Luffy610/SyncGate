@@ -89,3 +89,32 @@ Each model ships with a **model card** in `ml/models/`: version, SHA-256, traini
 
 - ML owns a training and evaluation pipeline ([ADR-0020](0020-testing-strategy-and-ml-evaluation.md)) and the model cards.
 - GA is **blocked** until TBD-L2 is resolved for the embedding and liveness models.
+
+## Amendment 1 (04-11-2026): first implementation
+
+The pipeline is implemented in `packages/sg_vision` and evaluated in `ml/` ([report](../../ml/reports/sface-int8-lfw.md)). Where it differs from the decision above:
+
+| Topic | Decision above | As built | Why |
+|---|---|---|---|
+| Where inference runs | Native Kotlin/Swift pipeline; no frame reaches Dart | **One Dart pipeline** on a background isolate, LiteRT through [`flutter_litert`](https://pub.dev/packages/flutter_litert) (Apache-2.0, classic Interpreter API, XNNPACK, 4 threads) | One implementation on both OSes gives strict Android/iOS parity, and the CI host runs the *same* `.tflite` files and code as the phones. Frames are copied into isolate memory, never written, logged or sent, and zeroed after analysis, so §3's privacy guarantee holds. A native path stays open if profiling on the reference phone needs it. |
+| Detector | BlazeFace short-range | As decided (Apache-2.0, float16, 0.2 MB) plus a **second pass on a crop around the face** for sharper keypoints | Keypoints at 128 px on a full frame are too coarse for alignment. |
+| Alignment | 5-point similarity transform | **4-point** (eyes, nose tip, mouth centre) onto a template **calibrated for BlazeFace** on LFW folds 6–10 | BlazeFace has no mouth corners, and its points sit slightly off the ArcFace ones. |
+| Embedding | MobileFaceNet class, INT8, licence open (TBD-L2) | **SFace 2021dec** (MobileFaceNet trained with the SFace loss, OpenCV Zoo), INT8 dynamic-range, 9.9 MB, 128-d, plus flip test-time augmentation | The weights are published under Apache-2.0 by their authors. **TBD-L2 stays open for the training-data provenance**, which Legal must still clear before GA. |
+| Liveness | MiniFASNet-class PAD (ADR-0007) | **Not shipped yet.** The gate engine has the hook (`LivenessEstimator`, silent reject) | Needs weights with a clean licence and the in-house PAD set to calibrate. GA stays blocked on ADR-0007. |
+| Model integrity | Model card with SHA-256 | SHA-256s in `assets/models/manifest.json`; the app refuses a model that does not match | |
+
+Thresholds per preset (`T_match`, margin, `T_dup`, `T_adapt`) are produced by `ml/eval/evaluate.py` and shipped in the manifest, as ADR-0009 asks.
+
+## Amendment 2 (15-11-2026): frame orientation is measured, not trusted
+
+**What happened.** The first run on an iPhone recognised people poorly and enrolment was erratic. Cause: `camera_avfoundation` delivers stream frames already upright for the way the phone is held, yet reports `sensorOrientation = 90` for every camera. `sg_vision` turned each frame by that value, so every face reached the models lying on its side. Reproduced on the LFW frames: turned 90°, the pipeline rejects **83 %** of genuine pairs (upright: 8 %), accepts more impostors, and the head-turn estimate saturates, which breaks the enrolment steps and the quality hints. Android (CameraX) does stream frames in sensor orientation, so it was not affected.
+
+**Decisions.**
+
+1. On iOS the camera source applies no rotation; on Android it applies the sensor orientation.
+2. The pipeline no longer trusts either. An **upright guard** (`pipeline/upright_guard.dart`) runs the detector in all four orientations on the first frames that contain a face and keeps the orientation where the detector is most confident and the face looks upright. Over five frames this chose correctly in every trial on LFW frames (one frame: 98 %). Until it settles, faces are detected but never matched or enrolled. Afterwards it costs nothing, and it recalibrates if faces keep appearing tilted (30 in a row).
+3. A face tilted more than 45° is never used for matching (`QualityPolicy.maxRoll`).
+4. The dev flavour can show **live diagnostics** (`VISION_DIAGNOSTICS=true`; on by default in `scripts/run-on-device`): frame size, applied correction, speed, detector confidence, head pose, light, sharpness and the best match score against its threshold, over the preview and in the console. Numbers and worker IDs only. It is never enabled in staging or prod.
+5. Two smaller robustness changes from the same review: the multi-frame agreement window stretches on phones that analyse frames slowly (ADR-0009 §2 still needs 2 of the last 3 frames), and the enrolment pose windows are wider (front within about 18°, sides beyond about 16° with no upper limit).
+
+**Lesson.** A host test with correctly oriented frames cannot catch a camera-contract error. The parity suite now feeds frames turned 90°, 180° and 270° and requires the pipeline to correct itself; device runs remain mandatory before any release (ADR-0020).

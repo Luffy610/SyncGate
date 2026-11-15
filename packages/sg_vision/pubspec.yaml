@@ -1,5 +1,5 @@
 name: sg_vision
-description: SyncGate camera and face pipeline. Dart API now; native Kotlin/Swift plugin in E06.
+description: SyncGate camera and face pipeline (BlazeFace + SFace on LiteRT).
 version: 0.1.0
 publish_to: none
 resolution: workspace
@@ -9,9 +9,17 @@ environment:
   flutter: ">=3.47.0"
 
 dependencies:
+  camera: ^0.12.2
+  crypto: ^3.0.8
   flutter:
     sdk: flutter
+  flutter_litert: ^3.9.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  image: ^4.12.0
+
+flutter:
+  assets:
+    - assets/models/

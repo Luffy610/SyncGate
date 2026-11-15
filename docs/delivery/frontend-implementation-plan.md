@@ -152,6 +152,7 @@ Built on `feature/mobile-app-frontend`, **on demo data** (in-memory fakes and a 
 - iOS flavour schemes and any iOS run (FE-2). The iOS look is covered by widget tests only.
 - `local_auth`, `wakelock_plus`, `just_audio`/`flutter_tts`, `share_plus`, `mobile_scanner`, `device_info_plus`: all sit behind `sg_platform` interfaces with recording fakes.
 - Staging and prod entry points start with no services bound (they report "not wired" until F6).
+- **F6 · vision (done, `feature/face-recognition`):** `sg_vision` now holds the real pipeline (BlazeFace + SFace on LiteRT, ADR-0006 amendment 1) behind the same three interfaces. `apps/mobile/lib/src/app/vision_wiring.dart` binds it; the dev flavour uses it with `--dart-define=VISION=real`. Screens show the camera through `VisionPreview(textureId)`. Still open: liveness (ADR-0007), the encrypted template vault (ADR-0010), and a run on real phones.
 - Hindi strings are a first draft for a native speaker to review; the legal basis on the notice is still `[CONSENT OR LEGITIMATE USE — TBD]` (L-1).
 
 ---

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sg_domain/sg_domain.dart';
+import 'package:sg_vision/sg_vision.dart';
 import 'package:syncgate/src/app/app_config.dart';
 import 'package:syncgate/src/app/app_mode.dart';
 import 'package:syncgate/src/app/providers.dart';
@@ -65,6 +66,8 @@ Future<TestApp> pumpApp(
   DateTime? now,
   AppSettings? settings,
   void Function(DevEnvironment env)? configure,
+  VisionStack? realVision,
+  EnrolmentPolicy realEnrolment = const EnrolmentPolicy(),
 }) async {
   await loadTestFonts();
   tester.view.physicalSize = const Size(390 * 3, 844 * 3);
@@ -76,7 +79,12 @@ Future<TestApp> pumpApp(
   });
 
   final clock = FixedClock(now ?? demoMoment);
-  final env = DevEnvironment(freshInstall: freshInstall, clock: clock);
+  final env = DevEnvironment(
+    freshInstall: freshInstall,
+    clock: clock,
+    realVision: realVision,
+    realEnrolment: realEnrolment,
+  );
   if (settings != null) await env.backend.settingsRepo.save(settings);
   configure?.call(env);
 

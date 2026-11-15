@@ -27,6 +27,7 @@ Privacy-first · DPDP-ready · Works with no internet · Android and iOS from on
   - [macOS](#macos)
   - [Linux](#linux)
 - [Get the code and run it](#get-the-code-and-run-it)
+- [Run on your phone (USB)](#run-on-your-phone-usb)
 - [Try the demo](#try-the-demo)
 - [Run the tests](#run-the-tests)
 - [Troubleshooting](#troubleshooting)
@@ -75,7 +76,8 @@ The Flutter front end for every Phase 1 screen is built and tested (steps F0–F
 | Stage | State |
 |---|---|
 | F0–F5: monorepo, design system, gate, setup, admin screens, reports, settings | ✅ Done, on demo data |
-| F6: real database (SQLCipher), native camera and face model, licence server, share/audio plugins | ⏳ Next |
+| F6 · face recognition: camera, BlazeFace + SFace on LiteRT, enrolment, 1:N matching (`sg_vision`) | ✅ Done; **99.2 % LFW accuracy**, 97 % correct gate decisions ([ml/](ml/README.md)). Liveness and the encrypted template vault still to come. |
+| F6 · real database (SQLCipher), licence server, share/audio plugins | ⏳ Next |
 | F7: restore, Drive backup, more languages, store release | ⏳ Planned |
 | Golden (screenshot) tests, bundled fonts, iOS flavour schemes | ⏳ Need font files and a Mac |
 
@@ -113,6 +115,8 @@ flutter run --flavor dev -t lib/main_dev.dart --dart-define-from-file=env/dev.js
 ```
 
 You need Flutter **3.47.8** (pinned in [`.fvmrc`](.fvmrc)) and either an Android emulator/phone, or the [browser preview](#option-c--in-a-browser-no-emulator-needed).
+
+To try **face recognition on a real phone** over USB, use the one-command scripts instead: [Run on your phone (USB)](#run-on-your-phone-usb).
 
 ---
 
@@ -452,6 +456,8 @@ flutter run --flavor dev -t lib/main_dev.dart --dart-define-from-file=env/dev.js
 
 Add `--dart-define=DEV_START=gate` to skip the setup wizard and land on the gate with demo data. With more than one device connected, add `-d <device id>`.
 
+Add `--dart-define=VISION=real` to use the phone's front camera and the real face models instead of the scripted camera (demo data otherwise). The [phone scripts](#run-on-your-phone-usb) do all of this for you. The demo workers have no face codes, so enrol someone first (Admin → Workers → Enrol worker), then walk up to the gate. Face codes are kept in memory until the encrypted vault lands, so they are lost when the app restarts.
+
 The first build takes several minutes (Gradle downloads dependencies). Later builds take seconds, and while the app runs you can press **`r`** for hot reload and **`R`** for hot restart.
 
 #### Option B — iPhone simulator or device (macOS only)
@@ -508,6 +514,35 @@ The file is at `build/app/outputs/flutter-apk/app-dev-debug.apk`. Install it wit
 
 ---
 
+## Run on your phone (USB)
+
+Scripts in [`scripts/run-on-device/`](scripts/run-on-device/README.md) build the dev app and run it on a phone plugged in by USB, with the **real camera and face models** (release build, starting at the gate, owner PIN 123456). They check your tools, run `melos bootstrap` and `melos run gen`, find the phone and tell you what to fix if it isn't ready.
+
+| Your computer | Android phone | iPhone |
+|---|---|---|
+| **macOS** | `scripts/run-on-device/macos/android.sh` | `scripts/run-on-device/macos/ios.sh` |
+| **Windows** | `scripts\run-on-device\windows\android.cmd` (or `android.ps1` in PowerShell) | Needs a Mac |
+| **Linux** | `scripts/run-on-device/macos/android.sh` | Needs a Mac |
+
+**Prepare the phone once.** Android: *Settings → About phone →* tap **Build number** 7 times, turn on **USB debugging** in *Developer options*, plug in, and allow USB debugging. iPhone: tap **Trust This Computer**, turn on *Settings → Privacy & Security → Developer Mode* (iOS 16+). The first `ios.sh` run opens Xcode so you can pick a signing team; a free Apple ID works.
+
+```bash
+# macOS, from the repo root
+scripts/run-on-device/macos/android.sh
+scripts/run-on-device/macos/ios.sh
+```
+
+```bat
+:: Windows (Command Prompt, or double-click), from the repo root
+scripts\run-on-device\windows\android.cmd
+```
+
+While the real camera runs, a strip over the preview shows **live diagnostics** (frame size, speed, face and match scores), and the same numbers are printed in the terminal on lines starting `[sg_vision]`. If recognition looks wrong, those lines say why; send them with the phone model.
+
+Useful options: `--device <id>` to pick a phone, `--debug` for hot reload (slower recognition), `--setup-wizard`, `--demo-camera`, `--no-diagnostics`, and `--rotation 90|180|270` to force the camera orientation (rarely needed: the app works it out from the first few faces). On Windows the same options are `-Device`, `-DebugBuild`, `-SetupWizard`, `-DemoCamera`, `-NoDiagnostics` and `-Rotation`. All of them, what to try once the app is running, and fixes for common problems are in [the scripts' README](scripts/run-on-device/README.md).
+
+---
+
 ## Try the demo
 
 The dev flavour is a complete working app on fake data. Nothing you do leaves your machine.
@@ -551,6 +586,14 @@ melos run test           # unit and widget tests in every package
 melos run format:check   # fails if any Dart file needs formatting
 ```
 
+The face-recognition end-to-end tests run the real models on LFW faces. They need a one-off download and Python 3.11+ (they skip, with a message, without it):
+
+```bash
+python3 -m venv .venv && . .venv/bin/activate && pip install -r ml/requirements.txt
+ml/scripts/fetch_lfw.sh .cache/ml
+python -I ml/scripts/make_e2e_fixtures.py --data .cache/ml --out .cache/ml/e2e
+```
+
 To fix formatting: `dart format .`
 
 Run one package or one file:
@@ -568,7 +611,8 @@ What is covered:
 | `sg_domain` | Attendance rules, shift windows, "today" calculations (pure Dart) |
 | `sg_ui` | Every shared component, in both iOS and Android looks, at 1.3× text size |
 | `sg_l10n` | Date/time formats and English-Hindi key parity |
-| `apps/mobile` | Each screen group, plus an end-to-end test: fresh install → setup → enrol → mark at gate → correct a record → export, on both platforms |
+| `sg_vision` | Geometry, camera-frame conversion, matching and enrolment rules; Dart-vs-Python pipeline parity; **face-recognition e2e**: 100 workers enrolled and 100 strangers through the real models and services |
+| `apps/mobile` | Each screen group, plus an end-to-end test: fresh install → setup → enrol → mark at gate → correct a record → export, on both platforms; and the same enrol → gate flow on the **real face models** |
 
 CI (`.github/workflows/pr.yml`) runs format, analyze and test on every pull request. Run the same three commands before you push.
 
@@ -614,8 +658,10 @@ packages/sg_domain/   Pure Dart: entities, attendance rules, shift engine, repos
 packages/sg_ui/       Design tokens and adaptive iOS/Android components
 packages/sg_l10n/     Translations (ARB: English, Hindi) and Indian date/time formats
 packages/sg_platform/ Interfaces for kiosk, clock, voice, share, biometric, QR scan
-packages/sg_vision/   Interfaces for face capture and camera checks (native plugin comes in F6)
-tools/                Repo scripts (import-boundary check)
+packages/sg_vision/   Face recognition on the phone: camera, BlazeFace + SFace on LiteRT, matching, enrolment
+ml/                   Model cards, conversion, LFW evaluation and test fixtures (Python)
+tools/                Repo scripts (import-boundary check, device picker for the phone scripts)
+scripts/run-on-device/ One-command runs on a USB phone: macos/ (Android, iOS) and windows/ (Android)
 docs/                 PRD, architecture decisions, delivery plans, designs
 .github/workflows/    CI
 ```

@@ -1,5 +1,6 @@
-# Pull-request checks (ADR-0021). F0 scope: format, import boundaries,
-# analyzer and tests. Native, security and golden steps join as they land.
+# Pull-request checks (ADR-0021): format, import boundaries, analyzer and
+# tests, including the face-recognition tests on the real models (ADR-0020).
+# Native, security and golden steps join as they land.
 name: pr
 
 on:
@@ -41,6 +42,25 @@ jobs:
 
       - name: Analyze (incl. import boundaries)
         run: melos run analyze
+
+      # Face fixtures for the sg_vision and app face-recognition tests: LFW
+      # photos placed in synthetic gate frames. Generated, never committed.
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: ml/requirements.txt
+
+      - uses: actions/cache@v4
+        with:
+          path: .cache/ml/lfw
+          key: lfw-9b711dca71a4-ea42330c62c9
+
+      - name: Face fixtures
+        run: |
+          ml/scripts/fetch_lfw.sh .cache/ml
+          pip install -r ml/requirements.txt
+          python -I ml/scripts/make_e2e_fixtures.py --data .cache/ml --out .cache/ml/e2e
 
       - name: Test
         run: melos run test
